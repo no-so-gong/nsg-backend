@@ -1,6 +1,15 @@
 from fastapi import FastAPI
-from app.routers import predict
+from fastapi.middleware.cors import CORSMiddleware
+from app.routers import hello
 
 app = FastAPI()
 
-app.include_router(predict.router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 개발 중에는 전체 허용
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(hello.router)
