@@ -18,13 +18,13 @@ pip install -r requirements.txt
 
 ### 3. 실행
 ```bash
-uvicorn app.main:app --reload # 자동으로 8000 포트
+uvicorn app.main:app --host 0.0.0.0 --reload # 자동으로 8000 포트
 ```
 > 💡 --reload는 코드 변경 시 자동으로 서버를 재시작해줍니다.
 정상 실행 시 아래 메시지가 표시됩니다:
 
 ```bash
-Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 ```
 
 - http://127.0.0.1:8000 → 기본 루트 경로
