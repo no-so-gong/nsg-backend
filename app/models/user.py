@@ -1,9 +1,12 @@
-from sqlalchemy import Column, Integer, String
-from core.database import Base  # Base는 declarative_base()
+from sqlalchemy import Column, Integer, TIMESTAMP, func
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
+
+from app.core.database import Base
 
 class User(Base):
     __tablename__ = "users"
 
-#    id = Column(Integer, primary_key=True, index=True)
-#    username = Column(String(50), unique=True, nullable=False)
-#   email = Column(String(100), unique=True, nullable=False)
+    userId = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False, index=True)
+    createdAt = Column(TIMESTAMP, nullable=False, server_default=func.now())
+    money = Column(Integer, nullable=False, default=0)
