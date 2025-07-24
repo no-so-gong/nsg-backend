@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class EmotionInput(BaseModel):
+class MLInput(BaseModel):
     current_emotion: int
     action_count: int
     user_pattern_bias: float

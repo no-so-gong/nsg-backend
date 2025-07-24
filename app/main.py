@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import hello
-from app.routers import predict
+from app.api.care import controller
 
 app = FastAPI()
 
@@ -13,5 +12,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(hello.router)
-app.include_router(predict.router)
+app.include_router(controller.router)
