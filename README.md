@@ -53,23 +53,44 @@ pip freeze > requirements.txt
 
 ```
 nsg-backend-template/
-├── app/
-│   ├── main.py              # FastAPI 앱 진입점
-│   ├── core/                # (예정) 설정, 공통 유틸 등 핵심 구성요소
-│   ├── routers/             # API 엔드포인트 라우터
-│   │   └── predict.py       # 예시용 엔드포인트 (테스트용)
-│   ├── schemas/             # Pydantic 기반 요청/응답 스키마 정의
-│   │   └── input.py         # 예시용 입력 스키마 (테스트용)
-│   └── services/            # 비즈니스 로직, 모델 로딩/예측 등 처리
-│       └── predictor.py     # 예시용 예측 로직 구현 (테스트용)
-│
-├── model/                   # 학습된 머신러닝 모델 저장 위치
-│   └── emotion_model.pkl    # (.gitignore에 의해 Git 추적 제외)
-│
-├── venv/                    # 가상환경 (.gitignore에 의해 Git 추적 제외)
-├── .env                     # 환경 변수 파일 (.gitignore에 의해 Git 추적 제외)
-├── .env.example             # 환경 변수 예시 파일
-├── .gitignore               # Git 추적 제외 설정
-├── requirements.txt         # 프로젝트 의존성 정의
-└── README.md                # 프로젝트 설명 문서
+app/
+├── api/                            # 각 기능별 API 라우터, 서비스, 스키마 모듈
+│   ├── care/                       # '케어' 도메인: 감정 예측 등 동물 관리 기능
+│   │   ├── controller.py          # 케어 관련 라우터 정의 (FastAPI @router)
+│   │   ├── schema.py              # 케어 기능용 요청/응답 Pydantic 모델 정의
+│   │   ├── service.py             # 케어 서비스 로직 처리 (비즈니스 로직)
+│   │   └── __init__.py            # 모듈 임포트를 위한 초기화 파일
+│   ├── pet/                       # '반려동물' 도메인: 동물 정보 기능
+│   │   ├── controller.py          # 반려동물 관련 API 라우터
+│   │   ├── schema.py              # 반려동물 요청/응답 데이터 구조
+│   │   ├── service.py             # 반려동물 관련 로직 처리
+│   │   └── __init__.py            # 모듈 초기화용
+│   ├── user/                      # '유저' 도메인: 사용자 관리 기능 (예: 인증, 정보)
+│   │   ├── controller.py          # 유저 관련 API 라우터
+│   │   ├── schema.py              # 유저 요청/응답 데이터 구조
+│   │   └── __init__.py            # 모듈 초기화용
+│   └── __init__.py                # api 패키지 초기화
+├── core/                          # 공통 유틸리티 및 시스템 설정
+│   ├── config.py                  # 환경변수 로딩 및 설정값 정의
+│   ├── database.py                # DB 연결 및 세션 생성 설정 (SQLAlchemy)
+│   └── exceptions.py              # 커스텀 예외 및 예외 처리 핸들러 정의
+├── models/                        # SQLAlchemy ORM 모델 정의
+│   ├── __init__.py                # 모든 모델을 import하는 초기화 파일
+│   ├── animal.py                  # 동물(Animal) 테이블 정의
+│   └── user.py                    # 사용자(User) 테이블 정의
+├── main.py                        # FastAPI 앱 진입점 (라우터 등록, 실행 등)
+├── create_tables.py              # 테이블을 DB에 실제로 생성하는 스크립트
+ML/
+└── emotion_model.pkl             # 학습된 감정 예측 머신러닝 모델 (피클 파일)
+
+```
+
+## PostgreSQL 연동(진행중)
+
+```bash
+pip install sqlalchemy
+
+pip install asyncpg
+
+pip install databases
 ```
