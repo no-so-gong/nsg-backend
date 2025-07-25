@@ -12,5 +12,5 @@ class Animal(Base):
     currentEmotion = Column(Numeric(5, 2), nullable=False, server_default=text("50.00"))
     birthday = Column(Date, nullable=False)
     userId = Column(UUID(as_uuid=True), ForeignKey("users.userId"), nullable=False)
-    userPatternBias = Column(Numeric(3, 2), nullable=False, server_default=text("0.00"))
+    userPatternBias = Column(Numeric(3, 2), nullable=False, server_default=text("0.33"))
     daySinceLastCare = Column(Integer, nullable=False, server_default=text("0"))

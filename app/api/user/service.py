@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.api.user.repository import insert_user
 from app.core.exception import CustomException
 
+# 유저 생성(/users/start)
 def create_user(db: Session):
     try:
         return insert_user(db)          # repositry.py 의 함수 사용

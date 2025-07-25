@@ -9,6 +9,7 @@ from app.core.database import Base, engine
 
 # 라우터
 from app.api.care.controller import router as care_router
+from app.api.pet.controller import router as pet_router
 from app.api.user.controller import router as user_router
 
 # 예외 핸들러
@@ -37,6 +38,7 @@ app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 # 라우터 등록
 app.include_router(care_router)
+app.include_router(pet_router)
 app.include_router(user_router)
 
 # 서버가 실행되면 자동으로 "http://localhost:8000/api/v1/users/start"로 post를 보내서 유저 자동 생성

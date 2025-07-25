@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from uuid import UUID
 
-class UserCreateResponse(BaseModel):    # 응답의 데이터 형식
+# 유저 생성 응답 dto(/users/start)
+class UserCreateResponse(BaseModel):   
     userId: UUID
