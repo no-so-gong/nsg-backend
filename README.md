@@ -93,7 +93,7 @@ ML/
 ```bash
 pip install sqlalchemy
 
-pip install asyncpg
+pip install psycopg2-binary
 
 pip install databases
 ```
