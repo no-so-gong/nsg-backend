@@ -96,7 +96,21 @@ pip install sqlalchemy
 pip install psycopg2-binary
 
 pip install databases
+
+pip install pydantic
+
+pip install dpython-dotenv
+
 ```
+
+한번에 설치
+
+```bash
+
+pip install sqlalchemy psycopg2-binary databases pydantic dpython-dotenv
+
+```
+
 ### pgAdmin4에 접속 후 nosogong_db 생성
 ```bash
 CREATE DATABASE nosogong_db;
