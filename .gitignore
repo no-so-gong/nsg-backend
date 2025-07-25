@@ -3,4 +3,4 @@ __pycache__/
 venv/
 *.pyc
 /model/*.pkl
-README.mdREADME.md
+README.md

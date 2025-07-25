@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, TIMESTAMP, func
+from sqlalchemy import Column, Integer, TIMESTAMP, func, text
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
@@ -9,4 +9,4 @@ class User(Base):
 
     userId = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False, index=True)
     createdAt = Column(TIMESTAMP, nullable=False, server_default=func.now())
-    money = Column(Integer, nullable=False, default=0)
+    money = Column(Integer, nullable=False, server_default=text("0"))

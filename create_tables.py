@@ -1,14 +1,11 @@
 # create_tables.py
-import asyncio
-from app.core.database import database
 from app.core.database import engine, Base
-import app.models  # 모델들 import
+import app.models  # 모델 등록 (user 등)
 
-async def create_tables():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)  # 모든 테이블 삭제
-        await conn.run_sync(Base.metadata.create_all)  # 모든 테이블 생성
-    await database.disconnect()
+def create_tables():
+    # 기존 테이블 모두 삭제 후 새로 생성
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
 
 if __name__ == "__main__":
-    asyncio.run(create_tables())
+    create_tables()
