@@ -53,6 +53,8 @@ pip freeze > requirements.txt
 
 ```
 nsg-backend-template/
+├── create_tables.py              # 테이블을 DB에 실제로 생성하는 스크립트
+├── test_connection.py             # PostgreSQL 연동 확인 테스트
 app/
 ├── api/                            # 각 기능별 API 라우터, 서비스, 스키마 모듈
 │   ├── care/                       # '케어' 도메인: 감정 예측 등 동물 관리 기능
@@ -79,7 +81,6 @@ app/
 │   ├── animal.py                  # 동물(Animal) 테이블 정의
 │   └── user.py                    # 사용자(User) 테이블 정의
 ├── main.py                        # FastAPI 앱 진입점 (라우터 등록, 실행 등)
-├── create_tables.py              # 테이블을 DB에 실제로 생성하는 스크립트
 ML/
 └── emotion_model.pkl             # 학습된 감정 예측 머신러닝 모델 (피클 파일)
 
