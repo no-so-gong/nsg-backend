@@ -86,7 +86,7 @@ ML/
 
 ```
 
-## PostgreSQL 연동(진행중)
+## PostgreSQL 연동
 
 ### 1. 패키지 설치 
 
