@@ -9,7 +9,6 @@ class AnimalNicknameRequestItem(BaseModel):
 
 # 동물 이름 지어주기 요청(/pets/nickname)
 class AnimalNicknameRequest(BaseModel):
-    userId: UUID
     animals: List[AnimalNicknameRequestItem]
 
 # 동물 이름 지어주기 응답(/pets/nickname)

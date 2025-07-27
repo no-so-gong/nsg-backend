@@ -9,7 +9,7 @@ from app.core.exception import CustomException
 # 동물 이름 새로 지어주면서 만들기("/pets/nickname")
 def register_pet_nicknames(db: Session, user_id: UUID, animal_list: List[dict]) -> Dict[str, str]:
     if len(animal_list) != 3:
-        raise CustomException("동물 이름은 3개 모두 입력되어야 합니다.", status=400)
+        raise CustomException(message = "동물 이름은 3개 모두 입력되어야 합니다.", status=400)
 
     species_map = {1: "shiba", 2: "chick", 3: "duck"}
     birthday_map = {
@@ -24,7 +24,7 @@ def register_pet_nicknames(db: Session, user_id: UUID, animal_list: List[dict]) 
         name = item["name"]
 
         if animal_id not in species_map:
-            raise CustomException(f"animalId {animal_id}는 잘못된 값입니다.", status=400)
+            raise CustomException(message = f"animalId {animal_id}는 잘못된 값입니다.", status=400)
 
         create_animal(
             db=db,
