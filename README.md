@@ -111,7 +111,13 @@ pip install sqlalchemy psycopg2-binary databases pydantic dpython-dotenv
 
 ```
 
-### pgAdmin4에 접속 후 nosogong_db 생성
+``` requirements.txt 에서 가져오기
+
+pip install -r requirements.txt
+
+```
+
+### pgAdmin4에 접속 후 nosogong_db 생성(PostgreSQL 설치 후에 진행)
 ```bash
 CREATE DATABASE nosogong_db;
 ```
