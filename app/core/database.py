@@ -28,7 +28,7 @@ Base = declarative_base()
 metadata = MetaData()
 
 def get_db():
-    db: Session = SessionLocal()    # DB 세션 하나 생성
+    db = SessionLocal()    # DB 세션 하나 생성
     try:
         yield db                    # 세션을 외부에 "빌려줌"
     finally:
