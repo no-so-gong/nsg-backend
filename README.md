@@ -121,3 +121,5 @@ pip install -r requirements.txt
 ```bash
 CREATE DATABASE nosogong_db;
 ```
+## .env.example
+.env.example을 .env로 복사해서 사용하기
