@@ -42,16 +42,16 @@ app.include_router(pet_router)
 app.include_router(user_router)
 
 # 서버가 실행되면 자동으로 "http://localhost:8000/api/v1/users/start"로 post를 보내서 유저 자동 생성
-def call_start_api_after_server_ready():
-    # 서버가 완전히 켜질 때까지 잠깐 기다림
-    time.sleep(1.5)  # 상황에 따라 1~2초로 조절
-    try:
-        response = requests.post("http://localhost:8000/api/v1/users/start")
-        print(f"✅ /start API 호출 성공: {response.status_code}, {response.json()}")
-    except Exception as e:
-        print(f"❌ /start API 호출 실패: {e}")
+# def call_start_api_after_server_ready():
+#     # 서버가 완전히 켜질 때까지 잠깐 기다림
+#     time.sleep(1.5)  # 상황에 따라 1~2초로 조절
+#     try:
+#         response = requests.post("http://localhost:8000/api/v1/users/start")
+#         print(f"✅ /start API 호출 성공: {response.status_code}, {response.json()}")
+#     except Exception as e:
+#         print(f"❌ /start API 호출 실패: {e}")
 
-@app.on_event("startup")
+@app.on_event("startup") # 서버 실행시
 def on_startup():
     Base.metadata.create_all(bind=engine)                               # 테이블 자동 생성(python create_tables.py 와 동일)
-    threading.Thread(target=call_start_api_after_server_ready).start()  # call_start_api_after_server_ready() 함수 호출을 통해 유저 생성
+    # threading.Thread(target=call_start_api_after_server_ready).start()  # call_start_api_after_server_ready() 함수 호출을 통해 유저 생성
