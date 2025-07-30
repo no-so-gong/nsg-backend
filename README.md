@@ -121,10 +121,8 @@ pip install -r requirements.txt
 ```bash
 CREATE DATABASE nosogong_db;
 ```
-5. ## .env.example
-.env.example을 .env로 복사해서 사용하기
 
-6. ## 테스트 코드 
+## 5. 테스트 코드 
 ```bash
 pip install pytest
 pip install httpx
