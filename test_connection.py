@@ -1,14 +1,17 @@
 # test_connection.py
-import asyncio
-from app.core.database import database
 
-async def test_db_connection():
+from app.core.database import SessionLocal
+from sqlalchemy import text
+
+def test_db_connection():
     try:
-        await database.connect()
+        db = SessionLocal()
+        db.execute(text("SELECT 1"))
         print("✅ PostgreSQL 연결 성공!")
-        await database.disconnect()
     except Exception as e:
         print("❌ PostgreSQL 연결 실패:", e)
+    finally:
+        db.close()
 
 if __name__ == "__main__":
-    asyncio.run(test_db_connection())
+    test_db_connection()
