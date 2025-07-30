@@ -117,9 +117,15 @@ pip install -r requirements.txt
 
 ```
 
-### pgAdmin4에 접속 후 nosogong_db 생성(PostgreSQL 설치 후에 진행)
+### 2. pgAdmin4에 접속 후 nosogong_db 생성(PostgreSQL 설치 후에 진행)
 ```bash
 CREATE DATABASE nosogong_db;
 ```
-## .env.example
+5. ## .env.example
 .env.example을 .env로 복사해서 사용하기
+
+6. ## 테스트 코드 
+```bash
+pip install pytest
+pip install httpx
+```
