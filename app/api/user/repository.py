@@ -5,10 +5,10 @@ from datetime import datetime
 from app.core.config import KST
 
 def insert_user(db: Session) -> User: # 데이터베이스에 유저를 추가하는 쿼리
-     # 유저가 이미 하나라도 있으면 새로 생성하지 않음
-    existing_user = db.query(User).first()
-    if existing_user:
-        return existing_user
+    # 유저가 이미 하나라도 있으면 새로 생성하지 않음
+    # existing_user = db.query(User).first()
+    # if existing_user:
+    #     return existing_user
 
     now_kst = datetime.now(KST)
 
