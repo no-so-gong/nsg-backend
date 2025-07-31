@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from app.main import app
 
-# 사용자 생성 테스트
+# 사용자 생성 테스트(/users/start)
 def test_start_user_creation(client):
     # API 요청
     response = client.post("/api/v1/users/start")

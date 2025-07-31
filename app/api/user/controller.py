@@ -11,3 +11,6 @@ router = APIRouter(prefix="/api/v1/users", tags=["User"])
 def start_game(db: Session = Depends(get_db)):                                                  # 요청 시 DB 세션을 get_db() 함수로부터 주입받음 (의존성 주입).
     user = create_user(db)                                                                      # 서비스 레이어에서 실제 유저 생성 로직을 호출.
     return {"userId": user.userId}                                                              # 생성된 userId를 JSON으로 반환.
+
+# 유저 보유 돈 만드는 api
+
