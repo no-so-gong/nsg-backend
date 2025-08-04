@@ -32,3 +32,8 @@ def test_user_property(client, db_session):
 
     response = client.get("/api/v1/users/property", headers={"user-id": str(user.userId)})
     assert response.status_code == 200
+
+    data = response.json()
+    assert data["money"] == 30
+    assert data["message"] == "현재 보유 골드 조회 성공"
+    assert data["status"] == 200
