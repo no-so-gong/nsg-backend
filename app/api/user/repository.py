@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.user import User
-from uuid import uuid4
+from uuid import uuid4, UUID
 from datetime import datetime
 from app.core.config import KST
 
@@ -18,3 +18,6 @@ def insert_user(db: Session) -> User: # 데이터베이스에 유저를 추가�
     db.commit()
     db.refresh(new_user)
     return new_user
+
+def get_user_by_id(db: Session, user_id: UUID):
+    return db.query(User).filter(User.userId == user_id).first()
