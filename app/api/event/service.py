@@ -65,7 +65,7 @@ def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
 
     # TODO: 유저 보상 지급 처리 (Users.money += rewardAmount)
 
-    repository.commit(db)
+    repository.commit_db(db)
 
     all_logs = logs + [new_log]
     checked_day_ids = {log.attendanceRewardId for log in all_logs}
