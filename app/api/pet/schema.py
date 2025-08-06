@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import List
 from uuid import UUID
+from typing import List, Literal, Optional
 
 # 동물의 id, 이름의 포멧
 class AnimalNicknameRequestItem(BaseModel):
@@ -16,3 +17,4 @@ class AnimalNicknameResponse(BaseModel):
     message: str
     data: dict
     status: int
+

@@ -37,3 +37,5 @@ def register_pet_nicknames(db: Session, user_id: UUID, animal_list: List[dict]) 
         result[species_map[animal_id]] = name
 
     return result
+
+
