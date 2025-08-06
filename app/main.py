@@ -11,6 +11,8 @@ from app.core.database import Base, engine
 from app.api.care.controller import router as care_router
 from app.api.pet.controller import router as pet_router
 from app.api.user.controller import router as user_router
+from app.api.event.controller import router as event_router
+
 
 # 예외 핸들러
 from app.core.exception import (
@@ -40,6 +42,7 @@ app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.include_router(care_router)
 app.include_router(pet_router)
 app.include_router(user_router)
+app.include_router(event_router)
 
 # 서버가 실행되면 자동으로 "http://localhost:8000/api/v1/users/start"로 post를 보내서 유저 자동 생성
 # def call_start_api_after_server_ready():

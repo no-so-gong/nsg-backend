@@ -62,3 +62,4 @@ def get_pet_info_service(db: Session, user_id: UUID, animal_id: int) -> AnimalIn
         isRunaway=animal.isRunaway,
         status=200
     )
+
