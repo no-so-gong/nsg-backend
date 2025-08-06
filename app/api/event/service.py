@@ -14,7 +14,7 @@ def get_attendance_data(user_id: UUID, db: Session) -> AttendanceResponseData:
 
     total_attendance = len(logs)
     already_checked_in = any(log.date == today for log in logs)
-    today_index = min(total_attendance + 1, 7)
+    today_index = ((total_attendance - 1) % 7) + 1
 
     # 오늘 받을 보상
     today_reward_row = next((r for r in rewards if r.attendanceRewardId == today_index), None)
@@ -51,7 +51,7 @@ def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
     # 누적 출석 수 계산 (기존 로그 수)
     logs = db.query(AttendanceLog).filter(AttendanceLog.userId == user_id).all()
     total_attendance = len(logs) + 1  # 오늘 포함
-    today_index = min(total_attendance, 7)
+    today_index = ((total_attendance - 1) % 7) + 1
 
     # 오늘 출석 보상 정보 조회
     reward_row = db.query(AttendanceReward).filter(AttendanceReward.attendanceRewardId == today_index).first()
