@@ -21,4 +21,11 @@ def create_animal(db: Session, user_id: UUID, animal_id: int, name: str, birthda
     db.refresh(animal)
     return animal
 
+# 동물 상태 상세 조회(/pets/{animalId})
+def get_animal_by_user_and_id(db: Session, user_id: UUID, animal_id: int):
+    return db.query(Animal).filter(
+        Animal.userId == user_id,
+        Animal.animalId == animal_id
+    ).first()
+
 
