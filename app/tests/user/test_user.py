@@ -5,7 +5,7 @@ from uuid import uuid4
 from datetime import datetime
 from app.core.config import KST
 
-# 사용자 생성 테스트
+# 사용자 생성 테스트(/users/start)
 def test_start_user_creation(client):
     # API 요청
     response = client.post("/api/v1/users/start")

@@ -33,3 +33,4 @@ def get_user_property(db: Session = Depends(get_db), user_id: UUID = Header(...,
         )
     except CustomException as e:
         raise e
+
