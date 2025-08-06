@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.api.event.service import get_attendance_data, check_in_attendance
-from app.api.event.schema import AttendanceResponseData, AttendanceResponse
+from app.api.event.schema import AttendanceResponse
 from uuid import UUID
 from app.core.exception import CustomException
 import traceback
