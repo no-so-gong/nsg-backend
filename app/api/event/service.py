@@ -6,7 +6,7 @@ from app.core.exception import CustomException
 from app.models.attendance import AttendanceLog, AttendanceReward
 from app.api.event import repository
 
-
+# 출석 보상 조회(/event/attendance)
 def get_attendance_data(user_id: UUID, db: Session) -> AttendanceResponseData:
     today = date.today()
     logs = repository.get_attendance_logs(db, user_id)
@@ -40,7 +40,7 @@ def get_attendance_data(user_id: UUID, db: Session) -> AttendanceResponseData:
         board=board
     )
 
-
+# 출석 보상 받기(/event/attendance/checkin)
 def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
     today = date.today()
 
