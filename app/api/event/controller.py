@@ -7,7 +7,7 @@ from uuid import UUID
 from app.core.exception import CustomException
 import traceback
 
-router = APIRouter(prefix="/api/v1/event", tags=["event"])
+router = APIRouter(prefix="/api/v1/events", tags=["event"])
 
 @router.get("/attendance", response_model=AttendanceResponse)
 def attendance_info(user_id: UUID = Header(..., alias="user-id"), db: Session = Depends(get_db)):
