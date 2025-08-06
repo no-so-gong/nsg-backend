@@ -27,4 +27,7 @@ class AnimalInfoResponse(BaseModel):
     currentEmotion: int
     isRunaway: bool
     status: int    
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main

@@ -1,26 +1,27 @@
 from datetime import date
-from sqlalchemy.orm import Session
-from app.models.attendance import AttendanceLog, AttendanceReward
-from app.api.event.schema import AttendanceResponseData, Reward, BoardItem
-from fastapi import HTTPException
 from uuid import UUID
+from sqlalchemy.orm import Session
+from app.api.event.schema import AttendanceResponseData, Reward, BoardItem
+from app.core.exception import CustomException
+from app.models.attendance import AttendanceLog, AttendanceReward
+from app.api.event import repository
 
-# 출석 보상 조회
+
 def get_attendance_data(user_id: UUID, db: Session) -> AttendanceResponseData:
     today = date.today()
-
-    logs = db.query(AttendanceLog).filter(AttendanceLog.userId == user_id).all()
-    rewards = db.query(AttendanceReward).order_by(AttendanceReward.attendanceRewardId).all()
+    logs = repository.get_attendance_logs(db, user_id)
+    rewards = repository.get_attendance_rewards(db)
 
     total_attendance = len(logs)
     already_checked_in = any(log.date == today for log in logs)
     today_index = ((total_attendance - 1) % 7) + 1
 
-    # 오늘 받을 보상
     today_reward_row = next((r for r in rewards if r.attendanceRewardId == today_index), None)
-    today_reward = Reward(type=today_reward_row.rewardType, amount=today_reward_row.rewardAmount) if today_reward_row else Reward(type="money", amount=0)
+    today_reward = Reward(
+        type=today_reward_row.rewardType,
+        amount=today_reward_row.rewardAmount
+    ) if today_reward_row else Reward(type="money", amount=0)
 
-    # board 생성
     checked_day_ids = {log.attendanceRewardId for log in logs}
     board = [
         BoardItem(
@@ -39,43 +40,36 @@ def get_attendance_data(user_id: UUID, db: Session) -> AttendanceResponseData:
         board=board
     )
 
-#  출석 보상 받기
+
 def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
     today = date.today()
 
-    # 오늘 출석 기록 있는지 체크
-    existing = db.query(AttendanceLog).filter(AttendanceLog.userId == user_id, AttendanceLog.date == today).first()
-    if existing:
-        raise HTTPException(status_code=409, detail="이미 오늘 출석하셨습니다.")
+    if repository.get_today_attendance_log(db, user_id, today):
+        raise CustomException(message="이미 오늘 출석하셨습니다.", status=409)
 
     # 누적 출석 수 계산 (기존 로그 수)
     logs = db.query(AttendanceLog).filter(AttendanceLog.userId == user_id).all()
     total_attendance = len(logs) + 1  # 오늘 포함
     today_index = ((total_attendance - 1) % 7) + 1
 
-    # 오늘 출석 보상 정보 조회
-    reward_row = db.query(AttendanceReward).filter(AttendanceReward.attendanceRewardId == today_index).first()
+    reward_row = repository.get_reward_by_index(db, today_index)
     if not reward_row:
         reward_row = AttendanceReward(attendanceRewardId=today_index, rewardAmount=0, rewardType="money")
 
-    # 출석 로그 저장
     new_log = AttendanceLog(
         date=today,
         userId=user_id,
         attendanceRewardId=reward_row.attendanceRewardId
     )
-    db.add(new_log)
+    repository.save_attendance_log(db, new_log)
 
-    # TODO: 유저 보상 머니 지급 로직 추가 (Users 테이블 업데이트 등)
-    # ex) user = db.query(User).filter(User.userId == user_id).first()
-    # user.money += reward_row.rewardAmount
+    # TODO: 유저 보상 지급 처리 (Users.money += rewardAmount)
 
-    db.commit()
+    repository.commit(db)
 
-    # 출석 기록 다시 조회 및 보상판(보드) 생성
     all_logs = logs + [new_log]
     checked_day_ids = {log.attendanceRewardId for log in all_logs}
-    rewards = db.query(AttendanceReward).order_by(AttendanceReward.attendanceRewardId).all()
+    rewards = repository.get_attendance_rewards(db)
 
     board = [
         BoardItem(
