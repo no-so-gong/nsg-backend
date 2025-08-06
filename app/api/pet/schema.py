@@ -18,3 +18,12 @@ class AnimalNicknameResponse(BaseModel):
     data: dict
     status: int
 
+# 동물 상태 상세 조회 응답(/pets/{animalId})
+class AnimalInfoResponse(BaseModel):
+    animalId: int
+    name: str
+    userPatternBias: float
+    evolutionStage: Literal[1, 2, 3]
+    currentEmotion: int
+    isRunaway: bool
+    status: int    

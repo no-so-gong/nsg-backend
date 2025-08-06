@@ -54,10 +54,11 @@ pip freeze > requirements.txt
 ```
 nsg-backend-template/
 ├── create_tables.py              # 테이블을 DB에 실제로 생성하는 스크립트
-├── test_connection.py             # PostgreSQL 연동 확인 테스트
+├── test_connection.py            # PostgreSQL 연동 확인 테스트
+├── pytest.ini                    # pytest 관련 설정 파일
 app/
-├── api/                            # 각 기능별 API 라우터, 서비스, 스키마 모듈
-│   ├── care/                       # '케어' 도메인: 감정 예측 등 동물 관리 기능
+├── api/                           # 각 기능별 API 라우터, 서비스, 스키마 모듈
+│   ├── care/                      # '케어' 도메인: 감정 예측 등 동물 관리 기능
 │   │   ├── controller.py          # 케어 관련 라우터 정의 (FastAPI @router)
 │   │   ├── schema.py              # 케어 기능용 요청/응답 Pydantic 모델 정의
 │   │   ├── service.py             # 케어 서비스 로직 처리 (비즈니스 로직)
@@ -81,6 +82,12 @@ app/
 │   ├── animal.py                  # 동물(Animal) 테이블 정의
 │   └── user.py                    # 사용자(User) 테이블 정의
 ├── main.py                        # FastAPI 앱 진입점 (라우터 등록, 실행 등)
+│   ├── care/                      # care tag api에 대한 test 코드 폴더
+│   │   ├── test_care.py           # care test 코드 파일
+│   ├── pet/                       # pet tag api에 대한 test 코드 폴더
+│   │   ├── test_pet.py            # pet test 코드 파일
+│   ├── user/                      # user tag api에 대한 test 코드 폴더
+│   │   ├── test_user.py           # user test 코드 파일
 ML/
 └── emotion_model.pkl             # 학습된 감정 예측 머신러닝 모델 (피클 파일)
 
@@ -121,10 +128,8 @@ pip install -r requirements.txt
 ```bash
 CREATE DATABASE nosogong_db;
 ```
-5. ## .env.example
-.env.example을 .env로 복사해서 사용하기
 
-6. ## 테스트 코드 
+## 5. 테스트 코드 
 ```bash
 pip install pytest
 pip install httpx
