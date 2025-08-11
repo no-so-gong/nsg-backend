@@ -28,4 +28,22 @@ def get_animal_by_user_and_id(db: Session, user_id: UUID, animal_id: int):
         Animal.animalId == animal_id
     ).first()
 
+# 동물 가출 상태 업데이트(/pets/{animalId}/runaway)
+def update_animal_runaway_status(db: Session, user_id: UUID, animal_id: int):
+    animal = db.query(Animal).filter(
+        Animal.userId == user_id,
+        Animal.animalId == animal_id
+    ).first()
+    
+    if animal is None:
+        raise CustomException("유효하지 않은 동물 ID입니다.", status=400)
+    
+    if animal.isRunaway:
+        raise CustomException("해당 동물은 이미 가출 상태입니다.", status=409)
+    
+    animal.isRunaway = True
+    db.commit()
+    db.refresh(animal)
+    return animal
+
 
