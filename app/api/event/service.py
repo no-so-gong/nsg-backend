@@ -48,7 +48,7 @@ def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
         raise CustomException(message="이미 오늘 출석하셨습니다.", status=409)
 
     # 누적 출석 수 계산 (기존 로그 수)
-    logs = db.query(AttendanceLog).filter(AttendanceLog.userId == user_id).all()
+    logs = repository.get_attendance_logs(db, user_id)
     total_attendance = len(logs) + 1  # 오늘 포함
     today_index = ((total_attendance - 1) % 7) + 1
 
@@ -64,6 +64,7 @@ def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
     repository.save_attendance_log(db, new_log)
 
     # TODO: 유저 보상 지급 처리 (Users.money += rewardAmount)
+    # 아마 나중에 유저의 money를 update하는 patch api 만들어야 할듯
 
     repository.commit_db(db)
 

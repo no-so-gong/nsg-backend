@@ -4,7 +4,7 @@ from uuid import UUID
 from datetime import date
 
 from app.api.pet.schema import AnimalInfoResponse
-from app.api.pet.repository import create_animal, get_animal_by_user_and_id
+from app.api.pet.repository import create_animal, get_animal_by_user_and_id, update_animal_runaway_status
 from app.core.exception import CustomException
 
 # 동물 이름 새로 지어주면서 만들기(/pets/nickname)
@@ -62,3 +62,12 @@ def get_pet_info_service(db: Session, user_id: UUID, animal_id: int) -> AnimalIn
         isRunaway=animal.isRunaway,
         status=200
     )
+
+# 동물 가출 처리(/pets/{animalId}/runaway)
+def handle_animal_runaway(db: Session, user_id: UUID, animal_id: int) -> Dict:
+    animal = update_animal_runaway_status(db, user_id, animal_id)
+    
+    return {
+        "animalId": animal.animalId,
+        "isRunaway": animal.isRunaway
+    }
