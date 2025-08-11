@@ -40,6 +40,9 @@ def update_animal_runaway_status(db: Session, user_id: UUID, animal_id: int):
     
     if animal.isRunaway:
         raise CustomException("해당 동물은 이미 가출 상태입니다.", status=409)
+
+    if animal.currentEmotion != 0:
+        raise CustomException("현재 감정치가 0이 아니므로 가출 처리할 수 없습니다.", status=400)
     
     animal.isRunaway = True
     db.commit()

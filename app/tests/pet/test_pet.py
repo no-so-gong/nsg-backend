@@ -2,6 +2,7 @@
 
 from fastapi.testclient import TestClient
 from app.main import app
+from app.models.animal import Animal
 
 client = TestClient(app)
 
@@ -80,7 +81,7 @@ def test_get_animal_info(client):
     assert data["status"] == 200
 
 # 동물 가출 처리 성공 테스트(/pets/{animalId}/runaway)
-def test_runaway_pet_success(client):
+def test_runaway_pet_success(client, db_session):
     # 먼저 유저 생성 API 호출
     user_response = client.post("/api/v1/users/start")
     assert user_response.status_code == 201
@@ -103,6 +104,11 @@ def test_runaway_pet_success(client):
         headers={"user-id": user_id}
     )
     assert nickname_response.status_code == 200
+
+    # 가출 조건 만족을 위해 감정치를 0으로 설정 (animalId: 2)
+    animal = db_session.query(Animal).filter(Animal.userId == user_id, Animal.animalId == 2).first()
+    animal.currentEmotion = 0
+    db_session.commit()
 
     # 가출 처리 요청 (chick - animalId: 2)
     response = client.post(
@@ -118,7 +124,7 @@ def test_runaway_pet_success(client):
     assert data["data"]["isRunaway"] == True
 
 # 이미 가출 상태인 동물 가출 처리 시도 테스트
-def test_runaway_pet_already_runaway(client):
+def test_runaway_pet_already_runaway(client, db_session):
     # 먼저 유저 생성 API 호출
     user_response = client.post("/api/v1/users/start")
     assert user_response.status_code == 201
@@ -141,6 +147,11 @@ def test_runaway_pet_already_runaway(client):
         headers={"user-id": user_id}
     )
     assert nickname_response.status_code == 200
+
+    # 가출 조건 만족을 위해 감정치를 0으로 설정 (animalId: 1)
+    animal = db_session.query(Animal).filter(Animal.userId == user_id, Animal.animalId == 1).first()
+    animal.currentEmotion = Decimal("0")
+    db_session.commit()
 
     # 첫 번째 가출 처리 (성공)
     first_runaway = client.post(
@@ -187,7 +198,7 @@ def test_runaway_pet_missing_user_id(client):
     assert response.status_code == 422  # Validation error for missing header
 
 # 가출 처리 후 동물 상태 확인 테스트
-def test_runaway_pet_status_check(client):
+def test_runaway_pet_status_check(client, db_session):
     # 먼저 유저 생성 API 호출
     user_response = client.post("/api/v1/users/start")
     assert user_response.status_code == 201
@@ -210,6 +221,11 @@ def test_runaway_pet_status_check(client):
         headers={"user-id": user_id}
     )
     assert nickname_response.status_code == 200
+
+    # 가출 조건 만족을 위해 감정치를 0으로 설정 (animalId: 3)
+    animal = db_session.query(Animal).filter(Animal.userId == user_id, Animal.animalId == 3).first()
+    animal.currentEmotion = Decimal("0")
+    db_session.commit()
 
     # 가출 처리 전 상태 확인 (동물 정보 조회 API 사용)
     before_response = client.get(
