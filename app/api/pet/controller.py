@@ -4,8 +4,8 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.api.pet.schema import AnimalNicknameRequest, AnimalNicknameResponse, AnimalInfoResponse
-from app.api.pet.service import register_pet_nicknames, get_pet_info_service
+from app.api.pet.schema import AnimalNicknameRequest, AnimalNicknameResponse, AnimalInfoResponse, AnimalEmotionResetResponse
+from app.api.pet.service import register_pet_nicknames, get_pet_info_service, handle_emotion_reset
 from app.core.exception import CustomException
 from uuid import UUID
 
@@ -34,3 +34,21 @@ def get_pet_info(animalId: int, db: Session = Depends(get_db) ,user_id: UUID = H
     if pet_info is None:
         raise CustomException(message = "해당 동물을 찾을 수 없습니다.", status=404)
     return pet_info    
+
+# 가출한 동물 데려오기 api
+@router.post("/{animalId}/return", response_model=AnimalEmotionResetResponse)
+def reset_emotion(animalId: int, db: Session = Depends(get_db), user_id: UUID = Header(..., alias="user-id")):
+    """가출한 동물 데려오기"""
+    try:
+        result = handle_emotion_reset(db, user_id, animalId)
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": "감정이 성공적으로 초기화되었습니다.",
+                "animal": result["animal"],
+                "money": result["money"],
+                "status": 200
+            }
+        )
+    except CustomException as e:
+        raise e
