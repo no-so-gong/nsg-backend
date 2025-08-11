@@ -150,7 +150,7 @@ def test_runaway_pet_already_runaway(client, db_session):
 
     # 가출 조건 만족을 위해 감정치를 0으로 설정 (animalId: 1)
     animal = db_session.query(Animal).filter(Animal.userId == user_id, Animal.animalId == 1).first()
-    animal.currentEmotion = Decimal("0")
+    animal.currentEmotion = 0
     db_session.commit()
 
     # 첫 번째 가출 처리 (성공)
@@ -224,7 +224,7 @@ def test_runaway_pet_status_check(client, db_session):
 
     # 가출 조건 만족을 위해 감정치를 0으로 설정 (animalId: 3)
     animal = db_session.query(Animal).filter(Animal.userId == user_id, Animal.animalId == 3).first()
-    animal.currentEmotion = Decimal("0")
+    animal.currentEmotion = 0
     db_session.commit()
 
     # 가출 처리 전 상태 확인 (동물 정보 조회 API 사용)
