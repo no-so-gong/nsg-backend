@@ -6,6 +6,7 @@ from app.core.exception import CustomException
 from app.models.attendance import AttendanceLog, AttendanceReward
 from app.api.event import repository
 
+# 출석 보상 조회(/event/attendance)
 def get_attendance_data(user_id: UUID, db: Session) -> AttendanceResponseData:
     today = date.today()
     logs = repository.get_attendance_logs(db, user_id)
@@ -13,11 +14,7 @@ def get_attendance_data(user_id: UUID, db: Session) -> AttendanceResponseData:
 
     total_attendance = len(logs)
     already_checked_in = any(log.date == today for log in logs)
-
-    if already_checked_in:
-        today_index = min(total_attendance, 7)
-    else:
-        today_index = min(total_attendance + 1, 7)
+    today_index = ((total_attendance - 1) % 7) + 1
 
     today_reward_row = next((r for r in rewards if r.attendanceRewardId == today_index), None)
     today_reward = Reward(
@@ -43,15 +40,17 @@ def get_attendance_data(user_id: UUID, db: Session) -> AttendanceResponseData:
         board=board
     )
 
+# 출석 보상 받기(/event/attendance/checkin)
 def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
     today = date.today()
 
     if repository.get_today_attendance_log(db, user_id, today):
         raise CustomException(message="이미 오늘 출석하셨습니다.", status=409)
 
+    # 누적 출석 수 계산 (기존 로그 수)
     logs = repository.get_attendance_logs(db, user_id)
-    total_attendance = len(logs) + 1
-    today_index = min(total_attendance, 7)
+    total_attendance = len(logs) + 1  # 오늘 포함
+    today_index = ((total_attendance - 1) % 7) + 1
 
     reward_row = repository.get_reward_by_index(db, today_index)
     if not reward_row:
@@ -65,8 +64,9 @@ def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
     repository.save_attendance_log(db, new_log)
 
     # TODO: 유저 보상 지급 처리 (Users.money += rewardAmount)
+    # 아마 나중에 유저의 money를 update하는 patch api 만들어야 할듯
 
-    repository.commit(db)
+    repository.commit_db(db)
 
     all_logs = logs + [new_log]
     checked_day_ids = {log.attendanceRewardId for log in all_logs}
