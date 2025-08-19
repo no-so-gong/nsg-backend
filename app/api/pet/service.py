@@ -4,7 +4,7 @@ from uuid import UUID
 from datetime import date
 
 from app.api.pet.schema import AnimalInfoResponse
-from app.api.pet.repository import create_animal, get_animal_by_user_and_id, reset_emotion_and_deduct_money
+from app.api.pet.repository import create_animal, get_animal_by_user_and_id, reset_emotion_and_deduct_money, update_animal_runaway_status
 from app.core.exception import CustomException
 
 # 동물 이름 새로 지어주면서 만들기(/pets/nickname)
@@ -75,4 +75,13 @@ def handle_emotion_reset(db: Session, user_id: UUID, animal_id: int, cost: int =
             "current_emotion": int(float(animal.currentEmotion)),
         },
         "money": remaining_money,
+
+# 동물 가출 처리(/pets/{animalId}/runaway)
+def handle_animal_runaway(db: Session, user_id: UUID, animal_id: int) -> Dict:
+    animal = update_animal_runaway_status(db, user_id, animal_id)
+    
+    return {
+        "animalId": animal.animalId,
+        "isRunaway": animal.isRunaway
+
     }

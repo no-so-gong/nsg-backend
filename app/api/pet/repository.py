@@ -29,6 +29,27 @@ def get_animal_by_user_and_id(db: Session, user_id: UUID, animal_id: int):
         Animal.animalId == animal_id
     ).first()
 
+# 동물 가출 상태 업데이트(/pets/{animalId}/runaway)
+def update_animal_runaway_status(db: Session, user_id: UUID, animal_id: int):
+    animal = db.query(Animal).filter(
+        Animal.userId == user_id,
+        Animal.animalId == animal_id
+    ).first()
+    
+    if animal is None:
+        raise CustomException("유효하지 않은 동물 ID입니다.", status=400)
+    
+    if animal.isRunaway:
+        raise CustomException("해당 동물은 이미 가출 상태입니다.", status=409)
+
+    if animal.currentEmotion != 0:
+        raise CustomException("현재 감정치가 0이 아니므로 가출 처리할 수 없습니다.", status=400)
+    
+    animal.isRunaway = True
+    db.commit()
+    db.refresh(animal)
+    return animal
+  
 # 가출한 동물 데려오기 처리(/pets/{animalId}/return)
 def reset_emotion_and_deduct_money(db: Session, user_id: UUID, animal_id: int, cost: int):
     # 동물 조회 및 소유자 확인
