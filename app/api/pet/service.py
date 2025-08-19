@@ -75,6 +75,7 @@ def handle_emotion_reset(db: Session, user_id: UUID, animal_id: int, cost: int =
             "current_emotion": int(float(animal.currentEmotion)),
         },
         "money": remaining_money,
+    }
 
 # 동물 가출 처리(/pets/{animalId}/runaway)
 def handle_animal_runaway(db: Session, user_id: UUID, animal_id: int) -> Dict:
@@ -83,5 +84,4 @@ def handle_animal_runaway(db: Session, user_id: UUID, animal_id: int) -> Dict:
     return {
         "animalId": animal.animalId,
         "isRunaway": animal.isRunaway
-
     }

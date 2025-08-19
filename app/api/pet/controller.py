@@ -49,6 +49,11 @@ def reset_emotion(animalId: int, db: Session = Depends(get_db), user_id: UUID = 
                 "message": "감정이 성공적으로 초기화되었습니다.",
                 "animal": result["animal"],
                 "money": result["money"],
+                "status": 200
+            }
+        )
+    except CustomException as e:
+        raise e   # 커스텀 예외는 그대로 상위 예외 핸들러로 전달
 
 # 동물 가출 처리 api
 @router.post("/{animalId}/runaway", response_model=AnimalRunawayResponse)
