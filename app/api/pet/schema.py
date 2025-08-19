@@ -27,3 +27,9 @@ class AnimalInfoResponse(BaseModel):
     currentEmotion: int
     isRunaway: bool
     status: int    
+
+# 동물 가출 처리 응답(/pets/{animalId}/runaway)
+class AnimalRunawayResponse(BaseModel):
+    message: str
+    data: dict
+    status: int    
