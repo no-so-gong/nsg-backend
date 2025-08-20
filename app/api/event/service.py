@@ -88,3 +88,53 @@ def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
         todayReward=Reward(type=reward_row.rewardType, amount=reward_row.rewardAmount),
         board=board
     )
+
+
+
+#생일 
+class BirthdayService:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def give_birthday_reward(self, user_id: UUID, today: date):
+        animal = repository.get_birthday_animal_by_user_and_date(self.db, user_id, today)
+        if not animal:
+            raise CustomException(message="오늘 생일이 아님", status=403)
+
+        if repository.has_birthday_reward_been_given(self.db, user_id, animal.animalId, today):
+            raise CustomException(message="이미 선물 수령함", status=409)
+
+        REWARD_AMOUNT = 100
+        REWARD_TYPE = "money"
+
+        birthday_reward = repository.BirthdayReward(
+            date=today,
+            userId=user_id,
+            animalId=animal.animalId,
+        )
+        repository.save_birthday_reward(self.db, birthday_reward)
+
+        # TODO: 유저 머니 업데이트 
+
+        self.db.commit()
+
+        return {
+            "animal_id": animal.animalId,
+            "name": animal.name,
+            "rewarded": True,
+            "reward": {
+                "type": REWARD_TYPE,
+                "amount": REWARD_AMOUNT
+            }
+        }
+
+    def get_birthday_animals(self, user_id: UUID, today: date):
+        animals = repository.get_birthday_animals_by_user_and_date(self.db, user_id, today)
+        return [
+            {
+                "animalId": a.animalId,
+                "name": a.name,
+                "rewarded": repository.has_birthday_reward_been_given(self.db, user_id, a.animalId, today)  # ✅ 수정
+            }
+            for a in animals
+        ]
