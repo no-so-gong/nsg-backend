@@ -11,7 +11,6 @@ class BirthdayReward(Base):
     date = Column(Date, nullable=False)
     userId = Column(UUID(as_uuid=True), nullable=False)
     animalId = Column(Integer, nullable=False)
-    userId2 = Column(UUID(as_uuid=True), nullable=False)
 
 class Animal(Base):
     __tablename__ = "animals"   # 소문자로 지정

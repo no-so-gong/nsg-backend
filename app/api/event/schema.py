@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List
 from typing import Optional
+from datetime import date
 
 # 보상 정보
 class Reward(BaseModel):
@@ -28,15 +29,12 @@ class AttendanceResponse(BaseModel):
     data: Optional[AttendanceResponseData]
 
 # 생일 보상 및 조회 관련 스키마
-class BirthdayRewardInfo(BaseModel):
-    type: str
-    amount: int
 
 class BirthdayRewardData(BaseModel):
     animal_id: int
     name: str
     rewarded: bool
-    reward: BirthdayRewardInfo
+    reward: Reward   
 
 class BirthdayRewardResponse(BaseModel):
     status: int
@@ -52,3 +50,11 @@ class BirthdayAnimalsResponse(BaseModel):
     status: int
     message: str
     data: List[BirthdayAnimalInfo]
+
+
+# --- 테스트용 임시 데이터 ---
+TEST_ANIMALS = [
+    {"animalId": 1, "name": "강아지", "birthday": date.today()},
+    {"animalId": 2, "name": "고양이", "birthday": date.today()},
+    {"animalId": 3, "name": "토끼", "birthday": date(2024,8,20)},
+]

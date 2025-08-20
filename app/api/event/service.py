@@ -111,11 +111,10 @@ class BirthdayService:
             date=today,
             userId=user_id,
             animalId=animal.animalId,
-            userId2=user_id
         )
         repository.save_birthday_reward(self.db, birthday_reward)
 
-        # TODO: 유저 머니 지급, moneyTransactions 기록 등 추가 필요
+        # TODO: 유저 머니 업데이트 
 
         self.db.commit()
 
@@ -135,7 +134,7 @@ class BirthdayService:
             {
                 "animalId": a.animalId,
                 "name": a.name,
-                "rewarded": False  # 보상 여부 체크 기능 필요 시 확장
+                "rewarded": repository.has_birthday_reward_been_given(self.db, user_id, a.animalId, today)  # ✅ 수정
             }
             for a in animals
         ]
