@@ -52,9 +52,3 @@ class BirthdayAnimalsResponse(BaseModel):
     data: List[BirthdayAnimalInfo]
 
 
-# --- 테스트용 임시 데이터 ---
-TEST_ANIMALS = [
-    {"animalId": 1, "name": "강아지", "birthday": date.today()},
-    {"animalId": 2, "name": "고양이", "birthday": date.today()},
-    {"animalId": 3, "name": "토끼", "birthday": date(2024,8,20)},
-]

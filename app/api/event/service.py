@@ -3,10 +3,10 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from app.api.event.schema import AttendanceResponseData, Reward, BoardItem
 from app.core.exception import CustomException
-from app.models.attendance import AttendanceLog, AttendanceReward
+from app.models.attendance import AttendanceReward
 from app.api.event import repository
 
-# 출석 보상 조회(/event/attendance)
+# 출석 보상 조회(/events/attendance)
 def get_attendance_data(user_id: UUID, db: Session) -> AttendanceResponseData:
     today = date.today()
     logs = repository.get_attendance_logs(db, user_id)
@@ -40,7 +40,7 @@ def get_attendance_data(user_id: UUID, db: Session) -> AttendanceResponseData:
         board=board
     )
 
-# 출석 보상 받기(/event/attendance/checkin)
+# 출석 보상 받기(/events/attendance/checkin)
 def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
     today = date.today()
 
@@ -56,17 +56,16 @@ def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
     if not reward_row:
         reward_row = AttendanceReward(attendanceRewardId=today_index, rewardAmount=0, rewardType="money")
 
-    new_log = AttendanceLog(
-        date=today,
-        userId=user_id,
-        attendanceRewardId=reward_row.attendanceRewardId
-    )
-    repository.save_attendance_log(db, new_log)
-
-    # TODO: 유저 보상 지급 처리 (Users.money += rewardAmount)
-    # 아마 나중에 유저의 money를 update하는 patch api 만들어야 할듯
-
-    repository.commit_db(db)
+    try:
+        new_log = repository.create_and_save_attendance_log(db, user_id, today, reward_row.attendanceRewardId)
+        
+        # TODO: 유저 보상 지급 처리 (Users.money += rewardAmount)
+        # 아마 나중에 유저의 money를 update하는 patch api 만들어야 할듯
+        
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
     all_logs = logs + [new_log]
     checked_day_ids = {log.attendanceRewardId for log in all_logs}
@@ -89,52 +88,46 @@ def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
         board=board
     )
 
+# 생일 축하 선물 받기(/events/birthday/reward)
+def give_birthday_reward(user_id: UUID, today: date, db: Session):
+    animal = repository.get_birthday_animal_by_user_and_date(db, user_id, today)
+    if not animal:
+        raise CustomException(message="오늘 생일이 아님", status=403)
 
+    if repository.has_birthday_reward_been_given(db, user_id, animal.animalId, today):
+        raise CustomException(message="이미 선물 수령함", status=409)
 
-#생일 
-class BirthdayService:
-    def __init__(self, db: Session):
-        self.db = db
+    REWARD_AMOUNT = 100
+    REWARD_TYPE = "money"
 
-    def give_birthday_reward(self, user_id: UUID, today: date):
-        animal = repository.get_birthday_animal_by_user_and_date(self.db, user_id, today)
-        if not animal:
-            raise CustomException(message="오늘 생일이 아님", status=403)
-
-        if repository.has_birthday_reward_been_given(self.db, user_id, animal.animalId, today):
-            raise CustomException(message="이미 선물 수령함", status=409)
-
-        REWARD_AMOUNT = 100
-        REWARD_TYPE = "money"
-
-        birthday_reward = repository.BirthdayReward(
-            date=today,
-            userId=user_id,
-            animalId=animal.animalId,
-        )
-        repository.save_birthday_reward(self.db, birthday_reward)
-
+    try:
+        birthday_reward = repository.create_and_save_birthday_reward(db, user_id, animal.animalId, today)
+        
         # TODO: 유저 머니 업데이트 
+        
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
-        self.db.commit()
-
-        return {
-            "animal_id": animal.animalId,
-            "name": animal.name,
-            "rewarded": True,
-            "reward": {
-                "type": REWARD_TYPE,
-                "amount": REWARD_AMOUNT
-            }
+    return {
+        "animal_id": animal.animalId,
+        "name": animal.name,
+        "rewarded": True,
+        "reward": {
+            "type": REWARD_TYPE,
+            "amount": REWARD_AMOUNT
         }
-
-    def get_birthday_animals(self, user_id: UUID, today: date):
-        animals = repository.get_birthday_animals_by_user_and_date(self.db, user_id, today)
-        return [
-            {
-                "animalId": a.animalId,
-                "name": a.name,
-                "rewarded": repository.has_birthday_reward_been_given(self.db, user_id, a.animalId, today)  # ✅ 수정
-            }
-            for a in animals
-        ]
+    }
+    
+# 오늘 생일인 동물 조회(/events/birthday)
+def get_birthday_animals(user_id: UUID, today: date, db: Session):
+    animals = repository.get_birthday_animals_by_user_and_date(db, user_id, today)
+    return [
+        {
+            "animalId": a.animalId,
+            "name": a.name,
+            "rewarded": repository.has_birthday_reward_been_given(db, user_id, a.animalId, today)
+        }
+        for a in animals
+    ]
