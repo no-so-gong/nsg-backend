@@ -5,6 +5,7 @@ from app.api.event.schema import AttendanceResponseData, Reward, BoardItem
 from app.core.exception import CustomException
 from app.models.attendance import AttendanceReward
 from app.api.event import repository
+from app.api.user.service import process_transaction
 
 # 출석 보상 조회(/events/attendance)
 def get_attendance_data(user_id: UUID, db: Session) -> AttendanceResponseData:
@@ -59,8 +60,8 @@ def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
     try:
         new_log = repository.create_and_save_attendance_log(db, user_id, today, reward_row.attendanceRewardId)
         
-        # TODO: 유저 보상 지급 처리 (Users.money += rewardAmount)
-        # 아마 나중에 유저의 money를 update하는 patch api 만들어야 할듯
+        # 유저 보상 지급 처리
+        process_transaction(db, user_id, reward_row.rewardAmount, "attendance")
         
         db.commit()
     except Exception:
@@ -103,7 +104,8 @@ def give_birthday_reward(user_id: UUID, today: date, db: Session):
     try:
         birthday_reward = repository.create_and_save_birthday_reward(db, user_id, animal.animalId, today)
         
-        # TODO: 유저 머니 업데이트 
+        # 유저 머니 업데이트
+        process_transaction(db, user_id, REWARD_AMOUNT, "birthday") 
         
         db.commit()
     except Exception:
