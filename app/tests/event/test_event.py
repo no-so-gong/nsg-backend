@@ -2,13 +2,17 @@ from fastapi.testclient import TestClient
 from datetime import date
 from app.models.animal import Animal
 from app.models.birthday import BirthdayReward
+from app.models.moneyTransaction import MoneyTransaction
 
 # 출석 체크 테스트(events/attendance/checkin)
-def test_attendance_checkin(client: TestClient):
+def test_attendance_checkin(client: TestClient, db_session):
     # 먼저 유저 생성
     user_response = client.post("/api/v1/users/start")
     assert user_response.status_code == 201
     user_id = user_response.json()["userId"]
+
+    # 출석 체크 전 트랜잭션 개수 확인
+    before_count = db_session.query(MoneyTransaction).filter_by(userId=user_id, source="attendance").count()
 
     # 출석 체크
     response = client.post(
@@ -25,6 +29,15 @@ def test_attendance_checkin(client: TestClient):
     assert "todayIndex" in data["data"]
     assert "todayReward" in data["data"]
     assert "board" in data["data"]
+    
+    # 새로운 머니 트랜잭션이 생성되었는지 확인
+    after_count = db_session.query(MoneyTransaction).filter_by(userId=user_id, source="attendance").count()
+    assert after_count == before_count + 1
+    
+    # 가장 최근 트랜잭션 확인
+    latest_transaction = db_session.query(MoneyTransaction).filter_by(userId=user_id, source="attendance").order_by(MoneyTransaction.createdAt.desc()).first()
+    assert latest_transaction is not None
+    assert latest_transaction.amount > 0
 
 
 # 출석 정보 조회 테스트(events/attendance)
@@ -146,6 +159,9 @@ def test_birthday_reward_success(client: TestClient, db_session):
     db_session.add(animal)
     db_session.commit()
 
+    # 생일 보상 지급 전 트랜잭션 개수 확인
+    before_count = db_session.query(MoneyTransaction).filter_by(userId=user_id, source="birthday").count()
+
     # 생일 보상 지급
     response = client.post(
         "/api/v1/events/birthday/reward",
@@ -160,6 +176,15 @@ def test_birthday_reward_success(client: TestClient, db_session):
     assert data["data"]["rewarded"] == True
     assert data["data"]["reward"]["type"] == "money"
     assert data["data"]["reward"]["amount"] == 100
+    
+    # 새로운 머니 트랜잭션이 생성되었는지 확인
+    after_count = db_session.query(MoneyTransaction).filter_by(userId=user_id, source="birthday").count()
+    assert after_count == before_count + 1
+    
+    # 가장 최근 트랜잭션 확인
+    latest_transaction = db_session.query(MoneyTransaction).filter_by(userId=user_id, source="birthday").order_by(MoneyTransaction.createdAt.desc()).first()
+    assert latest_transaction is not None
+    assert latest_transaction.amount == 100
 
 
 # 생일 보상 지급 테스트 - 생일이 아닌 경우(/events/birthday/reward)
