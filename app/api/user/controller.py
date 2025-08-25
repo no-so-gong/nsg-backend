@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, status, Header
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from app.api.user.schema import UserCreateResponse, UserPropertyResponse
-from app.api.user.service import create_user, get_user_property_service
+from app.api.user.schema import UserCreateResponse, UserPropertyResponse, TransactionRequest, TransactionResponse
+from app.api.user.service import create_user, get_user_property_service, process_transaction
 from app.core.exception import CustomException
 from app.core.database import get_db
 from uuid import UUID
@@ -33,4 +33,35 @@ def get_user_property(db: Session = Depends(get_db), user_id: UUID = Header(...,
         )
     except CustomException as e:
         raise e
+
+# 돈 거래 API
+@router.post("/transactions", response_model=TransactionResponse, status_code=status.HTTP_201_CREATED)
+def create_money_transaction(
+    request: TransactionRequest,
+    db: Session = Depends(get_db),
+    user_id: UUID = Header(..., alias="user-id")
+):
+    try:
+        transaction = process_transaction(db, user_id, request.amount, request.source)
+        
+        return JSONResponse(
+            status_code=201,
+            content={
+                "txId": transaction.txId,
+                "userId": str(transaction.userId),
+                "amount": transaction.amount,
+                "source": transaction.source,
+                "direction": transaction.direction.value,
+                "currentMoney": transaction.currentMoney,
+                "createdAt": transaction.createdAt.isoformat()
+            }
+        )
+    except CustomException as e:
+        return JSONResponse(
+            status_code=e.status,
+            content={
+                "message": e.message,
+                "status": e.status,
+            }
+        )
 
