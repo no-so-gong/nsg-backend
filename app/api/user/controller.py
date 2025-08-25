@@ -51,7 +51,7 @@ def create_money_transaction(
                 "userId": str(transaction.userId),
                 "amount": transaction.amount,
                 "source": transaction.source,
-                "direction": transaction.direction.value,
+                "direction": transaction.direction.value.upper(),
                 "currentMoney": transaction.currentMoney,
                 "createdAt": transaction.createdAt.isoformat()
             }

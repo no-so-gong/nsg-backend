@@ -22,7 +22,7 @@ def process_transaction(db: Session, user_id: UUID, amount: int, source: str):
         # 사용자 조회
         user = get_user_by_id(db, user_id)
         if not user:
-            raise CustomException(message="사용자를 찾을 수 없습니다.", status=404, code="USER_NOT_FOUND")
+            raise CustomException(message="사용자를 찾을 수 없습니다.", status=404)
         
         # 새로운 잔액 계산
         new_balance = user.money + amount
