@@ -4,6 +4,7 @@ from app.models.user import User
 from uuid import UUID
 from datetime import date
 from app.core.exception import CustomException
+from app.models.animal_price import AnimalPrice
 
 # 동물 이름 지어주면서 만들기(/pets/nickname)
 def create_animal(db: Session, user_id: UUID, animal_id: int, name: str, birthday: date):
@@ -91,3 +92,7 @@ def reset_emotion_and_deduct_money(db: Session, user_id: UUID, animal_id: int, c
     db.refresh(user)
 
     return animal, int(user.money)
+
+# 특정 카테고리의 tier 가격 가져오기
+def get_prices_by_category(db: Session, category: str):
+    return db.query(AnimalPrice).filter(AnimalPrice.category == category).all()

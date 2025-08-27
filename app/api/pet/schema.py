@@ -18,7 +18,7 @@ class AnimalNicknameResponse(BaseModel):
     data: dict
     status: int
 
-# 동물 상태 상세 조회 응답(/pets/{animalId})
+# 동물 상태 상세 조회 응답(/pets/{animalId}) <- 태연: 동물 특정 행동 카테고리 나도 이거 써!
 class AnimalInfoResponse(BaseModel):
     animalId: int
     name: str

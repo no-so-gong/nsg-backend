@@ -4,11 +4,13 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from fastapi import Query
 
 from app.api.pet.schema import AnimalNicknameRequest, AnimalNicknameResponse, AnimalInfoResponse, AnimalEmotionResetResponse, AnimalRunawayResponse
-from app.api.pet.service import register_pet_nicknames, get_pet_info_service, handle_emotion_reset, handle_animal_runaway
+from app.api.pet.service import register_pet_nicknames, get_pet_info_service, handle_emotion_reset, handle_animal_runaway, get_price_list_service
 from app.core.exception import CustomException
 from uuid import UUID
+from app.models.animal_price import CategoryEnum
 
 router = APIRouter(prefix="/api/v1/pets", tags=["Pet"])
 
@@ -76,3 +78,20 @@ def runaway_pet(animalId: int, db: Session = Depends(get_db), user_id: UUID = He
     except CustomException as e:
         raise e   # 커스텀 예외는 그대로 상위 예외 핸들러로 전달    
 
+
+# 특정 행동 카테고리 가격 조회 422 에러
+
+@router.get("/pricelist")
+def get_price_list(
+    category: CategoryEnum = Query(..., description="feed/play/gift"), 
+    animalId: int = Query(..., description="동물 ID"),                  
+    user_id: UUID = Header(..., alias="user-id"),
+    db: Session = Depends(get_db)
+):
+    pet_info = get_pet_info_service(db, user_id, animalId)
+    if pet_info is None:
+        raise CustomException(message="해당 동물을 찾을 수 없습니다.", status=404)
+
+    result = get_price_list_service(db, user_id, animalId, category.value)
+
+    return JSONResponse(status_code=200, content=result)

@@ -58,3 +58,4 @@ app.include_router(event_router)
 def on_startup():
     Base.metadata.create_all(bind=engine)                               # 테이블 자동 생성(python create_tables.py 와 동일)
     # threading.Thread(target=call_start_api_after_server_ready).start()  # call_start_api_after_server_ready() 함수 호출을 통해 유저 생성
+
