@@ -5,7 +5,7 @@ from app.core.database import Base
 class Animal(Base):
     __tablename__ = "Animals"
 
-    animalId = Column(Integer, primary_key=True, index=True)  # 1: 시바견, 2: 오리, 3: 병아리
+    animalId = Column(Integer, index=True)  # 1: 시바견, 2: 오리, 3: 병아리
     userId = Column(UUID(as_uuid=True), ForeignKey("Users.userId"), nullable=False)
 
     name = Column(String(10), nullable=False)

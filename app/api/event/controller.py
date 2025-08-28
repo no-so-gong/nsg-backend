@@ -50,6 +50,7 @@ def attendance_checkin(user_id: UUID  = Header(..., alias="user-id"), db: Sessio
     except CustomException as e:
         raise e
     except Exception:
+        traceback.print_exc()
         raise CustomException(message = "서버 내부 오류가 발생했습니다.", status=500)
     
 @router.post("/birthday/reward", response_model=BirthdayRewardResponse, summary="생일인 동물 보상 지급") 

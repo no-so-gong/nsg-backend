@@ -91,3 +91,18 @@ def reset_emotion_and_deduct_money(db: Session, user_id: UUID, animal_id: int, c
     db.refresh(user)
 
     return animal, int(user.money)
+
+# 동물 진화 단계 업데이트
+def update_animal_evolution_stage(db: Session, user_id: UUID, animal_id: int, evolution_stage: int):
+    animal = db.query(Animal).filter(
+        Animal.userId == user_id,
+        Animal.animalId == animal_id
+    ).first()
+    
+    if animal is None:
+        raise CustomException("유효하지 않은 동물 ID입니다.", status=400)
+    
+    animal.evolutionStage = evolution_stage
+    db.commit()
+    db.refresh(animal)
+    return animal

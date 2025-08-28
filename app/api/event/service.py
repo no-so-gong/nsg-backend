@@ -61,7 +61,7 @@ def check_in_attendance(user_id: UUID, db: Session) -> AttendanceResponseData:
         new_log = repository.create_and_save_attendance_log(db, user_id, today, reward_row.attendanceRewardId)
         
         # 유저 보상 지급 처리
-        process_transaction(db, user_id, reward_row.rewardAmount, "attendance")
+        process_transaction(db, user_id, reward_row.rewardAmount, "attendance", commit=False)
         
         db.commit()
     except Exception:
@@ -105,7 +105,7 @@ def give_birthday_reward(user_id: UUID, today: date, db: Session):
         birthday_reward = repository.create_and_save_birthday_reward(db, user_id, animal.animalId, today)
         
         # 유저 머니 업데이트
-        process_transaction(db, user_id, REWARD_AMOUNT, "birthday") 
+        process_transaction(db, user_id, REWARD_AMOUNT, "birthday", commit=False) 
         
         db.commit()
     except Exception:

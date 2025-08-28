@@ -6,6 +6,7 @@ import threading
 import time
 import requests
 from app.core.database import Base, engine
+from create_tables import insert_initial_data
 
 # 라우터
 from app.api.care.controller import router as care_router
@@ -57,4 +58,5 @@ app.include_router(event_router)
 @app.on_event("startup") # 서버 실행시
 def on_startup():
     Base.metadata.create_all(bind=engine)                               # 테이블 자동 생성(python create_tables.py 와 동일)
+    insert_initial_data()                                               # 초기 데이터 삽입
     # threading.Thread(target=call_start_api_after_server_ready).start()  # call_start_api_after_server_ready() 함수 호출을 통해 유저 생성

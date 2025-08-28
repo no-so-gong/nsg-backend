@@ -36,7 +36,6 @@ def get_pet_info(animalId: int, db: Session = Depends(get_db) ,user_id: UUID = H
         raise CustomException(message = "해당 동물을 찾을 수 없습니다.", status=404)
     return pet_info    
 
-
 # 가출한 동물 데려오기 api
 @router.post("/{animalId}/return", response_model=AnimalEmotionResetResponse)
 def reset_emotion(animalId: int, db: Session = Depends(get_db), user_id: UUID = Header(..., alias="user-id")):
