@@ -3,7 +3,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from app.core.database import Base
 
 class BirthdayReward(Base):
-    __tablename__ = 'birthdayRewards'
+    __tablename__ = 'BirthdayRewards'
 
     rewardId = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(Date, nullable=False)

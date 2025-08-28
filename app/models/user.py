@@ -5,7 +5,7 @@ import uuid
 from app.core.database import Base
 
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "Users"
 
     userId = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False, index=True)
     createdAt = Column(TIMESTAMP, nullable=False, server_default=func.now())
