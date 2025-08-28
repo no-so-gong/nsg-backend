@@ -17,7 +17,7 @@ def get_user_property_service(db: Session, user_id: UUID):
     return get_user_by_id(db, user_id)
 
 # 거래 처리(/users/transactions)
-def process_transaction(db: Session, user_id: UUID, amount: int, source: str):
+def process_transaction(db: Session, user_id: UUID, amount: int, source: str, commit: bool = True):
     try:
         # 사용자 조회
         user = get_user_by_id(db, user_id)
@@ -45,7 +45,8 @@ def process_transaction(db: Session, user_id: UUID, amount: int, source: str):
         # 거래 로그 생성
         transaction = create_transaction(db, user_id, amount, source, direction, new_balance)
         
-        db.commit()  # 명시적 커밋
+        if commit:
+            db.commit()
         
         return transaction
         
