@@ -2,33 +2,34 @@
 from app.core.database import engine, Base, SessionLocal
 import app.models  # 모델 등록 (user 등)
 from app.models.attendance import AttendanceReward
+from sqlalchemy import text
 
 def create_tables():
-    # 기존 테이블 모두 삭제 후 새로 생성
-    Base.metadata.drop_all(bind=engine)
+    # 테이블 구조 변경사항만 적용 (기존 데이터는 유지)
     Base.metadata.create_all(bind=engine)
-    
-    # AttendanceRewards 테이블에 초기 데이터 삽입
-    insert_initial_Data()
+    print("테이블 구조 업데이트 완료")
 
-# 초기 데이터 삽입
-def insert_initial_Data():
+# 개발용 - 초기 데이터 삽입 (필요시에만 별도로 실행)
+def insert_initial_data():
     db = SessionLocal()
     try:
-        # 초기 AttendanceRewards 데이터
-        initial_rewards = [
-            AttendanceReward(attendanceRewardId=1, rewardAmount=30, rewardType='money'),
-            AttendanceReward(attendanceRewardId=2, rewardAmount=40, rewardType='money'),
-            AttendanceReward(attendanceRewardId=3, rewardAmount=30, rewardType='money'),
-            AttendanceReward(attendanceRewardId=4, rewardAmount=40, rewardType='money'),
-            AttendanceReward(attendanceRewardId=5, rewardAmount=30, rewardType='money'),
-            AttendanceReward(attendanceRewardId=6, rewardAmount=40, rewardType='money'),
-            AttendanceReward(attendanceRewardId=7, rewardAmount=30, rewardType='money'),
-        ]
-        
-        db.add_all(initial_rewards)
-        db.commit()
-        print("AttendanceRewards 초기 데이터 삽입 완료")
+        # AttendanceRewards가 비어있을 때만 초기 데이터 삽입
+        if db.query(AttendanceReward).count() == 0:
+            initial_rewards = [
+                AttendanceReward(rewardAmount=30, rewardType='money'),
+                AttendanceReward(rewardAmount=40, rewardType='money'),
+                AttendanceReward(rewardAmount=30, rewardType='money'),
+                AttendanceReward(rewardAmount=40, rewardType='money'),
+                AttendanceReward(rewardAmount=30, rewardType='money'),
+                AttendanceReward(rewardAmount=40, rewardType='money'),
+                AttendanceReward(rewardAmount=30, rewardType='money'),
+            ]
+            
+            db.add_all(initial_rewards)
+            db.commit()
+            print("AttendanceRewards 초기 데이터 삽입 완료")
+        else:
+            print("AttendanceRewards 데이터가 이미 존재합니다.")
         
     except Exception as e:
         db.rollback()
