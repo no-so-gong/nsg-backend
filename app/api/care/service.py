@@ -39,7 +39,7 @@ def get_price_list_service(db: Session, category: str, animal_id: int, user_id: 
     valid_categories = ['feed', 'play', 'gift']
     if category not in valid_categories:
         raise CustomException(
-            message="지원하지 않는 카테고리입니다. (feed, play, gift 중 하나여야 합니다)",
+            message="올바르지 않은 카테고리입니다. (feed, play, gift 중 선택 가능)",
             status=400
         )
     
@@ -66,9 +66,9 @@ def get_price_list_service(db: Session, category: str, animal_id: int, user_id: 
     
     # 메시지 설정
     if evolution_stage == 1:
-        message = f"카테고리 {category}의 가격 정보 조회 완료"
+        message = f"카테고리 {category}의 가격 목록을 조회했습니다."
     else:
-        message = "진화 단계에 따라 가격이 조정되어 반환되었습니다."
+        message = "진화 단계가 높아서 가격이 올랐습니다."
     
     return PriceListResponse(
         animalId=animal_id,
