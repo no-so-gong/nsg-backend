@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Dict
 
 class MLInput(BaseModel):
     current_emotion: int
@@ -17,3 +18,11 @@ class MLInput(BaseModel):
     action_gift1: int
     action_gift2: int
     action_gift3: int
+
+class PriceListResponse(BaseModel):
+    animalId: int
+    evolutionStage: int
+    category: str
+    prices: Dict[str, int]
+    message: str
+    status: int
