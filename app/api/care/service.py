@@ -7,10 +7,11 @@ from uuid import UUID
 from typing import Dict, Optional
 
 from app.api.care.schema import MLInput, PriceListResponse
-from app.api.care.repository import get_animal_by_id, get_actions_by_category_and_evolution, get_category_by_name
+from app.api.care.repository import get_animal_by_id, get_actions_by_category_and_evolution, get_category_by_name, get_emotion_by_message
 from app.api.pet.service import get_pet_info_service
 from app.core.exception import CustomException
 from app.api.care.schema import EmotionMessageRequest, EmotionMessageResponse
+from app.models.emotionmessages import EmotionMessage
 
 
 # .env 파일 로드
@@ -82,63 +83,23 @@ def get_price_list_service(db: Session, category: str, animal_id: int, user_id: 
     )
 
 # 감정 변화 메시지
-def generate_emotion_message_service(req: EmotionMessageRequest) -> EmotionMessageResponse:
+def generate_emotion_message_service(db: Session, req: EmotionMessageRequest) -> EmotionMessageResponse:
     delta = req.predictedDelta
-    category = req.category
-
-    message_templates = {
-        "feed": {
-            "very_positive": "정말 맛있었나 봐요! 최고예요!",
-            "strong_positive": "배불러요! 아주 만족해요.",
-            "positive": "먹고 나니 기분이 좋아졌어요!",
-            "slightly_positive": "조금 기분이 좋아졌어요.",
-            "neutral": "별다른 반응은 없어요.",
-            "slightly_negative": "조금 실망한 것 같아요...",
-            "negative": "이건 별로였던 것 같아요.",
-            "very_negative": "기분이 더 나빠졌어요! 싫어요!"
-        },
-        "play": {
-            "very_positive": "정말 맛있었나 봐요! 최고예요!",
-            "strong_positive": "배불러요! 아주 만족해요.",
-            "positive": "먹고 나니 기분이 좋아졌어요!",
-            "slightly_positive": "조금 기분이 좋아졌어요.",
-            "neutral": "별다른 반응은 없어요.",
-            "slightly_negative": "조금 실망한 것 같아요...",
-            "negative": "이건 별로였던 것 같아요.",
-            "very_negative": "기분이 더 나빠졌어요! 싫어요!"
-        },
-        "gift": {
-         "very_positive": "정말 맛있었나 봐요! 최고예요!",
-            "strong_positive": "배불러요! 아주 만족해요.",
-            "positive": "먹고 나니 기분이 좋아졌어요!",
-            "slightly_positive": "조금 기분이 좋아졌어요.",
-            "neutral": "별다른 반응은 없어요.",
-            "slightly_negative": "조금 실망한 것 같아요...",
-            "negative": "이건 별로였던 것 같아요.",
-            "very_negative": "기분이 더 나빠졌어요! 싫어요!"
-        },
-    }
-    # predictedDelta의 범위
-    if delta >= 20:
-        mood = "very_positive"
-    elif 10 <= delta < 20:
-        mood = "strong_positive"
+    category_name = req.category
+    if delta >= 10:
+        level = 5
     elif 5 <= delta < 10:
-        mood = "positive"
-    elif 1 <= delta < 5:
-        mood = "slightly_positive"
-    elif delta == 0:
-        mood = "neutral"
-    elif -5 < delta < 0:
-        mood = "slightly_negative"
+        level = 4
+    elif -4 <= delta < 5:
+        level = 3
     elif -10 < delta <= -5:
-        mood = "negative"
-    else:  # delta <= -10
-        mood = "very_negative"
+        level = 2
+    elif delta <= -10:
+        level = 1
 
-    if category not in message_templates:
-        raise CustomException(message="잘못된 category 값입니다.", status=400)
+    message_obj = get_emotion_by_message(db, category_name, level)
 
-    message = message_templates[category][mood]
+    if not message_obj:
+        raise CustomException(message="해당 조건에 맞는 메시지를 찾을 수 없습니다.", status=404)
 
-    return EmotionMessageResponse(message=message, status=200)
+    return EmotionMessageResponse(message=message_obj.emotionMessage, status=200)

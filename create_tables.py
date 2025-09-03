@@ -5,6 +5,7 @@ from app.models.attendance import AttendanceReward
 from app.models.category import Category
 from app.models.action import Action
 from sqlalchemy import text
+from app.models.emotionmessages import EmotionMessage
 
 def create_tables():
     # 테이블 구조 변경사항만 적용 (기존 데이터는 유지)
@@ -95,6 +96,34 @@ def insert_initial_data():
         else:
             print("Actions 데이터가 이미 존재합니다.")
         
+         # EmotionMessages 초기값...
+        if db.query(EmotionMessage).count() == 0:
+            initial_emotion_messages = [
+                # play
+                EmotionMessage(emotionMessage="신나게 뛰어놀아서 너무 좋아!", emotionMessageLevel=5, categoryId=1),
+                EmotionMessage(emotionMessage="너와 함께라 즐거워", emotionMessageLevel=4, categoryId=1),
+                EmotionMessage(emotionMessage="나랑 놀자 놀자!", emotionMessageLevel=3, categoryId=1),
+                EmotionMessage(emotionMessage="나랑 더 놀아주지...", emotionMessageLevel=2, categoryId=1),
+                EmotionMessage(emotionMessage="이제는 너랑 놀기 싫어", emotionMessageLevel=1, categoryId=1),
+                # Feed            
+                EmotionMessage(emotionMessage="맛있는 사료 다 먹었어!", emotionMessageLevel=5, categoryId=2),
+                EmotionMessage(emotionMessage="잘 먹을게~", emotionMessageLevel=4, categoryId=2),
+                EmotionMessage(emotionMessage="나...배불러^^.", emotionMessageLevel=3, categoryId=2),
+                EmotionMessage(emotionMessage="다른 사료가 먹고싶은데...", emotionMessageLevel=2, categoryId=2),
+                EmotionMessage(emotionMessage="이딴걸 먹으라고?", emotionMessageLevel=1, categoryId=2),
+                # gift
+                EmotionMessage(emotionMessage="선물 고마워! 너무 좋아!!!", emotionMessageLevel=5, categoryId=3),
+                EmotionMessage(emotionMessage="선물 고마워.", emotionMessageLevel=4, categoryId=3),
+                EmotionMessage(emotionMessage="선물이네~", emotionMessageLevel=3, categoryId=3),
+                EmotionMessage(emotionMessage="선물이 마음에 안 들어...", emotionMessageLevel=2, categoryId=3),
+                EmotionMessage(emotionMessage="이게 뭐야...", emotionMessageLevel=1, categoryId=3),
+            ]
+            db.add_all(initial_emotion_messages)
+            db.commit()
+            print("EmotionMessages 초기 데이터 삽입 완료")
+        else:
+            print("EmotionMessages 데이터가 이미 존재합니다.")
+
     except Exception as e:
         db.rollback()
         print(f"초기 데이터 삽입 실패: {e}")

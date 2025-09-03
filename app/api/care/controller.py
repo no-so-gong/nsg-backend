@@ -31,11 +31,14 @@ def get_price_list(
 
 
 # 감정 메시지 출력
-@router.post("/emotion-message", response_model=EmotionMessageResponse)
-def generate_emotion_message(req: EmotionMessageRequest):
+@router.post("/emotion-message", response_model=EmotionMessageResponse, summary="감정 메시지 출력")
+def generate_emotion_message(
+    req: EmotionMessageRequest,
+    db: Session = Depends(get_db)
+):
     try:
-        return generate_emotion_message_service(req)
+        return generate_emotion_message_service(db, req)
     except CustomException as e:
         raise e
     except Exception:
-        raise CustomException(status_code=500, message="서버 내부 오류가 발생했습니다.")
+        raise CustomException(status=500, message="서버 내부 오류가 발생했습니다.")
