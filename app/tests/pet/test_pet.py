@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # tests/user/test_user.py
 
 from fastapi.testclient import TestClient

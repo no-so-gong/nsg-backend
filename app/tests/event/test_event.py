@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from fastapi.testclient import TestClient
 from datetime import date
 from app.models.animal import Animal
