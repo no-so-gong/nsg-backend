@@ -7,6 +7,7 @@ from app.models.action_log import ActionLog
 from uuid import UUID
 from typing import List, Optional
 from datetime import datetime, timedelta
+from app.models.emotionmessages import EmotionMessage
 
 def get_actions_by_category_and_evolution(db: Session, category_name: str, evolution_stage: int) -> List[Action]:
     return db.query(Action).join(Category).filter(
@@ -170,3 +171,13 @@ def log_action_result(db: Session, user_id: UUID, animal_id: int, action_id: int
     )
     
     db.add(action_log)
+
+def get_emotion_by_message(db: Session, category_name: str, level: int) -> Optional[EmotionMessage]:
+    category_obj = get_category_by_name(db, category_name)
+    if not category_obj:
+        return None
+    return db.query(EmotionMessage).filter(
+        EmotionMessage.categoryId == category_obj.categoryId,
+        EmotionMessage.emotionMessageLevel == level
+    ).first()
+

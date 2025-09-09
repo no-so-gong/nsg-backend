@@ -2,6 +2,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.models.user import User
 from app.models.animal import Animal
+from app.models.emotionmessages import EmotionMessage
 from uuid import uuid4
 from datetime import datetime, date
 from app.core.config import KST
@@ -176,6 +177,9 @@ def test_get_price_list_feed_category(client, db_session):
 
 # 테스트 6: play 카테고리 가격 목록 조회 성공
 def test_get_price_list_play_category(client, db_session):
+    # EmotionMessages 초기 데이터 주입
+    seed_emotion_messages(db_session)
+
     # play 카테고리 가격 목록 조회 성공 테스트
 
     # 먼저 유저 생성 API 호출
@@ -720,3 +724,70 @@ def test_care_action_negative_emotion_result(client, db_session, monkeypatch):
     data = response.json()
     assert data["newEmotion"] >= 0  # 감정은 0 이상이어야 함
     assert data["previousEmotion"] == 5.0
+
+# 테스트 18: 감정 메시지 출력 테스트 - 긍정, 중립, 부정 케이스
+def test_generate_emotion_message(client, db_session):
+    # EmotionMessages 초기 데이터 주입 (없으면 삽입)
+    seed_emotion_messages(db_session)
+
+    user_response = client.post("/api/v1/users/start")
+    assert user_response.status_code == 201
+    user_id = user_response.json()["userId"]
+
+    # 테스트 케이스 정의: (predictedDelta, category, expected_level)
+    test_cases = [
+        (12, "play", 5),   
+        (7, "feed", 4),    
+        (2, "gift", 3),    
+        (-3, "play", 3),  
+        (-7, "feed", 2),   
+        (-12, "gift", 1),  
+    ]
+
+    for predicted_delta, category, expected_level in test_cases:
+        response = client.post(
+            "/api/v1/cares/emotion-message",
+            json={"predictedDelta": predicted_delta, "category": category}
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        # DB에서 해당 메시지 확인
+        from app.api.care.repository import get_emotion_by_message
+        expected_message_obj = get_emotion_by_message(db_session, category, expected_level)
+        assert expected_message_obj is not None
+        assert data["message"] == expected_message_obj.emotionMessage
+
+
+        assert data["message"] == expected_message_obj.emotionMessage
+        assert data["status"] == 200
+
+
+# 헬퍼 함수: EmotionMessages 초기 데이터 주입
+def seed_emotion_messages(db_session):
+    from app.models.emotionmessages import EmotionMessage
+    from app.models.category import Category
+
+    if db_session.query(EmotionMessage).count() == 0:
+        categories = {c.name: c.categoryId for c in db_session.query(Category).all()}
+        initial_messages = [
+            EmotionMessage(emotionMessage="신나게 뛰어놀아서 너무 좋아!", emotionMessageLevel=5, categoryId=categories["play"]),
+            EmotionMessage(emotionMessage="너와 함께라 즐거워", emotionMessageLevel=4, categoryId=categories["play"]),
+            EmotionMessage(emotionMessage="나랑 놀자 놀자!", emotionMessageLevel=3, categoryId=categories["play"]),
+            EmotionMessage(emotionMessage="나랑 더 놀아주지...", emotionMessageLevel=2, categoryId=categories["play"]),
+            EmotionMessage(emotionMessage="이제는 너랑 놀기 싫어", emotionMessageLevel=1, categoryId=categories["play"]),
+
+            EmotionMessage(emotionMessage="맛있는 사료 다 먹었어!", emotionMessageLevel=5, categoryId=categories["feed"]),
+            EmotionMessage(emotionMessage="잘 먹을게~", emotionMessageLevel=4, categoryId=categories["feed"]),
+            EmotionMessage(emotionMessage="나...배불러^^.", emotionMessageLevel=3, categoryId=categories["feed"]),
+            EmotionMessage(emotionMessage="다른 사료가 먹고싶은데...", emotionMessageLevel=2, categoryId=categories["feed"]),
+            EmotionMessage(emotionMessage="이딴걸 먹으라고?", emotionMessageLevel=1, categoryId=categories["feed"]),
+
+            EmotionMessage(emotionMessage="선물 고마워! 너무 좋아!!!", emotionMessageLevel=5, categoryId=categories["gift"]),
+            EmotionMessage(emotionMessage="선물 고마워.", emotionMessageLevel=4, categoryId=categories["gift"]),
+            EmotionMessage(emotionMessage="선물이네~", emotionMessageLevel=3, categoryId=categories["gift"]),
+            EmotionMessage(emotionMessage="선물이 마음에 안 들어...", emotionMessageLevel=2, categoryId=categories["gift"]),
+            EmotionMessage(emotionMessage="이게 뭐야...", emotionMessageLevel=1, categoryId=categories["gift"]),
+        ]
+        db_session.add_all(initial_messages)
+        db_session.commit()

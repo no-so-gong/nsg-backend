@@ -12,12 +12,15 @@ from app.api.care.repository import (
     get_actions_by_category_and_evolution, get_category_by_name,
     get_action_by_id, calculate_recent_action_count, calculate_days_since_last_care,
     update_animal_emotion, log_action_result, update_user_pattern_bias,
-    reset_animal_days_since_care, increment_all_animals_days_since_care
+    reset_animal_days_since_care, increment_all_animals_days_since_care, 
+    get_actions_by_category_and_evolution, get_emotion_by_message
 )
 from app.api.pet.repository import get_animal_by_user_and_id, update_animal_evolution_stage
 from app.models.category import Category
 from app.api.user.service import process_transaction
 from app.core.exception import CustomException
+from app.api.care.schema import EmotionMessageRequest, EmotionMessageResponse
+from app.models.emotionmessages import EmotionMessage
 
 # .env 파일 로드
 load_dotenv()
@@ -236,3 +239,26 @@ def daily_increment_days_since_care_service(db: Session) -> dict:
     except Exception as e:
         db.rollback()
         raise CustomException(message="경과일 업데이트 중 오류가 발생했습니다.", status=500)
+
+# 감정 변화 메시지
+def generate_emotion_message_service(db: Session, req: EmotionMessageRequest) -> EmotionMessageResponse:
+    delta = req.predictedDelta
+    category_name = req.category
+    if delta >= 10:
+        level = 5
+    elif 5 <= delta < 10:
+        level = 4
+    elif -4 <= delta < 5:
+        level = 3
+    elif -10 < delta <= -5:
+        level = 2
+    elif delta <= -10:
+        level = 1
+
+    message_obj = get_emotion_by_message(db, category_name, level)
+
+    if not message_obj:
+        raise CustomException(message="해당 조건에 맞는 메시지를 찾을 수 없습니다.", status=404)
+
+    return EmotionMessageResponse(message=message_obj.emotionMessage, status=200)
+
