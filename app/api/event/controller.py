@@ -53,30 +53,6 @@ def attendance_checkin(user_id: UUID  = Header(..., alias="user-id"), db: Sessio
         traceback.print_exc()
         raise CustomException(message = "서버 내부 오류가 발생했습니다.", status=500)
     
-
-# 오늘 생일인 동물 조회
-
-# @router.get("/birthday", response_model=BirthdayAnimalsResponse, summary="생일인 동물 조회")
-# def birthday_animals(user_id: UUID = Header(..., alias="user-id")):
-#     today = date.today()
-#     today_animals = [
-#         BirthdayAnimalInfo(
-#             animalId=a["animalId"],
-#             name=a["name"],
-#             rewarded=False
-#         )
-#         for a in TEST_ANIMALS
-#         if a["birthday"].month == today.month and a["birthday"].day == today.day
-#     ]
-    
-#     message = "오늘 생일인 동물이 있습니다." if today_animals else "오늘은 생일인 동물이 없습니다."
-    
-#     return BirthdayAnimalsResponse(
-#         status=200,
-#         message=message,
-#         data=today_animals
-#     )
-
 @router.post("/birthday/reward", response_model=BirthdayRewardResponse, summary="생일인 동물 보상 지급") 
 def birthday_reward(
     user_id: UUID = Header(..., alias="user-id"),
