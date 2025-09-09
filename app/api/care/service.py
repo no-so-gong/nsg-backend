@@ -14,7 +14,7 @@ from app.api.care.repository import (
     update_animal_emotion, log_action_result, update_user_pattern_bias,
     reset_animal_days_since_care, increment_all_animals_days_since_care
 )
-from app.api.pet.repository import get_animal_by_user_and_id
+from app.api.pet.repository import get_animal_by_user_and_id, update_animal_evolution_stage
 from app.models.category import Category
 from app.api.user.service import process_transaction
 from app.core.exception import CustomException
@@ -85,6 +85,18 @@ def predict_and_apply_emotion_change(db: Session, user_id: UUID, animal_id: int,
         # 감정 상태 업데이트
         update_animal_emotion(db, animal_id, user_id, new_emotion)
         
+        # 진화 단계 업데이트 (감정에 따라)
+        if new_emotion >= 90:
+            evolution_stage = 3
+        elif new_emotion >= 70:
+            evolution_stage = 2
+        else:
+            evolution_stage = 1
+        
+        # 현재 진화 단계와 다르면 업데이트
+        if animal.evolutionStage != evolution_stage:
+            update_animal_evolution_stage(db, user_id, animal_id, evolution_stage)
+        
         # 편애도 업데이트 (전이율 0.3 적용)
         update_user_pattern_bias(db, user_id, animal_id, transfer_rate=0.3)
         
@@ -95,7 +107,7 @@ def predict_and_apply_emotion_change(db: Session, user_id: UUID, animal_id: int,
         log_action_result(db, user_id, animal_id, action_id, previous_emotion, 
                          new_emotion, predicted_delta, previous_bias, days_since_care)
         
-        db.commit()  # 모든 변경사항 (비용 차감, 감정 업데이트, 편애도 업데이트, 경과일 리셋, 로그 기록) 커밋
+        db.commit()  # 모든 변경사항 (비용 차감, 감정 업데이트, 진화 단계 업데이트, 편애도 업데이트, 경과일 리셋, 로그 기록) 커밋
     except Exception as e:
         db.rollback()
         print(f"Database update error: {str(e)}")  # 디버깅용 로그
