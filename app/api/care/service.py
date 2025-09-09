@@ -7,9 +7,12 @@ from uuid import UUID
 from typing import Dict, Optional
 
 from app.api.care.schema import MLInput, PriceListResponse
-from app.api.care.repository import get_animal_by_id, get_actions_by_category_and_evolution, get_category_by_name
+from app.api.care.repository import get_animal_by_id, get_actions_by_category_and_evolution, get_category_by_name, get_emotion_by_message
 from app.api.pet.service import get_pet_info_service
 from app.core.exception import CustomException
+from app.api.care.schema import EmotionMessageRequest, EmotionMessageResponse
+from app.models.emotionmessages import EmotionMessage
+
 
 # .env 파일 로드
 load_dotenv()
@@ -78,3 +81,25 @@ def get_price_list_service(db: Session, category: str, animal_id: int, user_id: 
         message=message,
         status=200
     )
+
+# 감정 변화 메시지
+def generate_emotion_message_service(db: Session, req: EmotionMessageRequest) -> EmotionMessageResponse:
+    delta = req.predictedDelta
+    category_name = req.category
+    if delta >= 10:
+        level = 5
+    elif 5 <= delta < 10:
+        level = 4
+    elif -4 <= delta < 5:
+        level = 3
+    elif -10 < delta <= -5:
+        level = 2
+    elif delta <= -10:
+        level = 1
+
+    message_obj = get_emotion_by_message(db, category_name, level)
+
+    if not message_obj:
+        raise CustomException(message="해당 조건에 맞는 메시지를 찾을 수 없습니다.", status=404)
+
+    return EmotionMessageResponse(message=message_obj.emotionMessage, status=200)

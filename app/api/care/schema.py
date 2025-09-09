@@ -1,6 +1,8 @@
-from pydantic import BaseModel
 from typing import Dict
+from pydantic import BaseModel
+from typing import Literal
 
+# 행동 
 class MLInput(BaseModel):
     current_emotion: int
     action_count: int
@@ -24,5 +26,14 @@ class PriceListResponse(BaseModel):
     evolutionStage: int
     category: str
     prices: Dict[str, int]
+    message: str
+    status: int
+
+# 감정 메시지 출력
+class EmotionMessageRequest(BaseModel):
+    predictedDelta: float
+    category: Literal["feed", "play", "gift"]
+
+class EmotionMessageResponse(BaseModel):
     message: str
     status: int

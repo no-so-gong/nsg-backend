@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Query, Header
 from sqlalchemy.orm import Session
 from uuid import UUID
-from app.api.care.schema import MLInput, PriceListResponse
-from app.api.care.service import predict_emotion, get_price_list_service
+from app.api.care.schema import MLInput, PriceListResponse, EmotionMessageResponse, EmotionMessageRequest
+from app.api.care.service import predict_emotion, get_price_list_service, generate_emotion_message_service
 from app.core.database import get_db
 from app.core.exception import CustomException
 
@@ -28,3 +28,17 @@ def get_price_list(
         raise e
     except Exception as e:
         raise CustomException(message="서버 내부 오류가 발생했습니다.", status=500)
+
+
+# 감정 메시지 출력
+@router.post("/emotion-message", response_model=EmotionMessageResponse, summary="감정 메시지 출력")
+def generate_emotion_message(
+    req: EmotionMessageRequest,
+    db: Session = Depends(get_db)
+):
+    try:
+        return generate_emotion_message_service(db, req)
+    except CustomException as e:
+        raise e
+    except Exception:
+        raise CustomException(status=500, message="서버 내부 오류가 발생했습니다.")
