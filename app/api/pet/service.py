@@ -4,7 +4,7 @@ from uuid import UUID
 from datetime import date
 
 from app.api.pet.schema import AnimalInfoResponse
-from app.api.pet.repository import create_animal, get_animal_by_user_and_id, reset_emotion_and_deduct_money, update_animal_runaway_status, update_animal_evolution_stage
+from app.api.pet.repository import create_animal, get_animal_by_user_and_id, reset_emotion_and_deduct_money, update_animal_runaway_status
 from app.core.exception import CustomException
 
 # 동물 이름 새로 지어주면서 만들기(/pets/nickname)
@@ -45,23 +45,13 @@ def get_pet_info_service(db: Session, user_id: UUID, animal_id: int) -> AnimalIn
     if animal is None:
         return None
 
-    emotion = animal.currentEmotion
-    if emotion >= 90:
-        evolutionStage = 3
-    elif emotion >= 70:
-        evolutionStage = 2
-    else:
-        evolutionStage = 1
-
-    # 계산된 진화 단계가 데이터베이스의 기존 진화 단계와 다르면 업데이트
-    if animal.evolutionStage != evolutionStage:
-        animal = update_animal_evolution_stage(db, user_id, animal_id, evolutionStage)
+    evolutionStage = animal.evolutionStage
 
     return AnimalInfoResponse(
         animalId=animal.animalId,
         name=animal.name,
         userPatternBias=animal.userPatternBias,
-        evolutionStage=evolutionStage,
+        evolutionStage=animal.evolutionStage,
         currentEmotion=animal.currentEmotion,
         isRunaway=animal.isRunaway,
         status=200
