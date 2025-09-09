@@ -725,7 +725,7 @@ def test_care_action_negative_emotion_result(client, db_session, monkeypatch):
     assert data["newEmotion"] >= 0  # 감정은 0 이상이어야 함
     assert data["previousEmotion"] == 5.0
 
-# 테스트 18: 감정 메시지 출력 테스트 - 긍정, 중립, 부정 케이스
+# 테스트 19: 감정 메시지 출력 테스트 - 긍정, 중립, 부정 케이스
 def test_generate_emotion_message(client, db_session):
     # EmotionMessages 초기 데이터 주입 (없으면 삽입)
     seed_emotion_messages(db_session)

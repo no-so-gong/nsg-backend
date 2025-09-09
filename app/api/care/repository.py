@@ -180,4 +180,3 @@ def get_emotion_by_message(db: Session, category_name: str, level: int) -> Optio
         EmotionMessage.categoryId == category_obj.categoryId,
         EmotionMessage.emotionMessageLevel == level
     ).first()
-

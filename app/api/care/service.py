@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import Dict, Optional
-
 from app.api.care.schema import MLInput, PriceListResponse, CareActionResponse
 from app.api.care.repository import (
     get_actions_by_category_and_evolution, get_category_by_name,
@@ -261,4 +260,3 @@ def generate_emotion_message_service(db: Session, req: EmotionMessageRequest) ->
         raise CustomException(message="해당 조건에 맞는 메시지를 찾을 수 없습니다.", status=404)
 
     return EmotionMessageResponse(message=message_obj.emotionMessage, status=200)
-
