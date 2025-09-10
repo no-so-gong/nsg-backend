@@ -6,6 +6,9 @@ from app.models.category import Category
 from app.models.action import Action
 from sqlalchemy import text
 from app.models.emotionmessages import EmotionMessage
+from app.models.minigames import Minigame
+from app.models.userminigameplays import UserMinigamePlay 
+from app.models.minigameattempts import MinigameAttempt
 
 def create_tables():
     # 테이블 구조 변경사항만 적용 (기존 데이터는 유지)
@@ -123,6 +126,19 @@ def insert_initial_data():
             print("EmotionMessages 초기 데이터 삽입 완료")
         else:
             print("EmotionMessages 데이터가 이미 존재합니다.")
+        
+        # Minigames가 비어있을 때만 초기 데이터 삽입
+        if db.query(Minigame).count() == 0:
+            initial_minigames = [
+                Minigame(minigameId=1, name='똥 피하기', description='하늘에서 떨어지는 똥을 피하는 게임', maxPlay=3),
+                Minigame(minigameId=2, name='테트리스', description='블록을 쌓아 가로 한 줄을 모두 채워 지우는 게임', maxPlay=3),
+                Minigame(minigameId=3, name='뱀 게임', description='벽이나 자기 자신에게 부딪히지 않고 먹이를 먹는 게임', maxPlay=3),
+            ]
+            db.add_all(initial_minigames)
+            db.commit()
+            print("Minigames 초기 데이터 삽입 완료")
+        else:
+            print("Minigames 데이터가 이미 존재합니다.")
 
     except Exception as e:
         db.rollback()
