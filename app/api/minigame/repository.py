@@ -64,11 +64,6 @@ def update_user_daily_play_count(db: Session, user_id: UUID, game_id: int, play_
         play_date = date.today()
     
     try:
-        # maxPlay 확인을 위해 미니게임 정보 조회
-        minigame = get_minigame_by_id(db, game_id)
-        if not minigame:
-            raise SQLAlchemyError(f"게임 ID {game_id}를 찾을 수 없습니다")
-        
         # 기존 기록 조회
         existing_play = db.query(UserMinigamePlay).filter(
             UserMinigamePlay.userId == user_id,
@@ -77,13 +72,10 @@ def update_user_daily_play_count(db: Session, user_id: UUID, game_id: int, play_
         ).first()
         
         if existing_play:
-            # 기존 기록이 있으면 플레이 횟수 증가 (동적 maxPlay 확인)
-            if existing_play.playCount < minigame.maxPlay:
-                existing_play.playCount += 1
-                db.flush()
-                return existing_play
-            else:
-                raise SQLAlchemyError(f"플레이 횟수는 {minigame.maxPlay}회를 초과할 수 없습니다")
+            # 기존 기록이 있으면 플레이 횟수 증가
+            existing_play.playCount += 1
+            db.flush()
+            return existing_play
         else:
             # 기존 기록이 없으면 새로 생성
             new_play = UserMinigamePlay(
