@@ -5,10 +5,11 @@ from app.api.ending.repository import get_user_by_id
 from app.api.minigame.repository import MinigameRepository
 from app.models.minigameattempts import MinigameAttempt
 
+# 미니게임 플레이 요청
 def start_minigame(db: Session, user_id: UUID, game_id: int):
     user = get_user_by_id(db, user_id)
     if not user:
-        raise CustomException("해당 유저를 찾을 수 없습니다.", 404)
+        raise CustomException("해당 유저를 찾을 수 없습니다.", 401)
 
     repo = MinigameRepository(db)
 

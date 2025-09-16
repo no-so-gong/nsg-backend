@@ -7,7 +7,7 @@ from uuid import UUID
 
 router = APIRouter(prefix="/api/v1/minigames", tags=["Minigames"])
 
-
+# 미니게임 플레이 요청
 @router.post("/{game_id}/start", response_model=MinigameStartResponse, summary="미니게임 플레이 요청")
 def start_game(
     game_id: int,

@@ -5,6 +5,7 @@ from uuid import UUID
 from app.models.minigames import Minigame
 from app.models.userminigameplays import UserMinigamePlay
 
+# 미니게임 플레이 요청
 class MinigameRepository:
     def __init__(self, db: Session):
         self.db = db
