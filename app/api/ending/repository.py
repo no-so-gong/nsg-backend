@@ -4,12 +4,16 @@ from sqlalchemy import delete
 
 from app.models.user import User
 from app.models.animal import Animal
-from app.models.moneyTransaction import MoneyTransaction
+from app.models.moneyTransaction import MoneyTransaction              
 from app.models.attendance import AttendanceLog
 from app.models.birthday import BirthdayReward
-
+from app.models.minigameattempts import MinigameAttempt
+from app.models.userminigameplays import UserMinigamePlay
 
 def delete_user_and_related_data(db: Session, user_id: UUID):
+    db.execute(delete(MinigameAttempt).where(MinigameAttempt.userId == user_id))
+    db.execute(delete(UserMinigamePlay).where(Animal.userId == user_id))
+
     # 연관 데이터 삭제 (동물, 트랜잭션, 출석, 생일 보상, 유저)
     db.execute(delete(Animal).where(Animal.userId == user_id))
     db.execute(delete(MoneyTransaction).where(MoneyTransaction.userId == user_id))
