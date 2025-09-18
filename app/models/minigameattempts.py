@@ -7,7 +7,7 @@ class MinigameAttempt(Base):
     __tablename__ = "MinigameAttempts"
 
     minigameAttemptId = Column(Integer, primary_key=True, index=True)
-    startedAt = Column(TIMESTAMP, nullable=False, server_default=func.now())
+    startedAt = Column(TIMESTAMP, nullable=True)
     completionAt = Column(TIMESTAMP)
     score = Column(Integer)
     timeSpent = Column(Integer)
