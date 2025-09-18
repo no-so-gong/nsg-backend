@@ -9,17 +9,18 @@ from app.models.minigameattempts import MinigameAttempt
 from app.models.userminigameplays import UserMinigamePlay
 from app.models.user import User
 
-# 미니게임 플레이 요청
-class MinigameRepository:
-    def __init__(self, db: Session):
-        self.db = db
-    def get_game_by_id(self, game_id: int) -> Minigame | None:
-        return self.db.query(Minigame).filter(Minigame.minigameId == game_id).first()
+def get_minigame_by_id(db: Session, game_id: int) -> Optional[Minigame]:
+    # 게임 ID로 미니게임 정보 조회
+    try:
+        return db.query(Minigame).filter(Minigame.minigameId == game_id).first()
+    except SQLAlchemyError as e:
+        raise e
 
+def get_today_play(db: Session, user_id: UUID, game_id: int) -> Optional[UserMinigamePlay]:
     # 오늘 플레이 기록 조회
-    def get_today_play(self, user_id: UUID, game_id: int) -> UserMinigamePlay | None:
+    try:
         return (
-            self.db.query(UserMinigamePlay)
+            db.query(UserMinigamePlay)
             .filter(
                 UserMinigamePlay.userId == user_id,
                 UserMinigamePlay.minigameId == game_id,
@@ -27,23 +28,21 @@ class MinigameRepository:
             )
             .first()
         )
+    except SQLAlchemyError as e:
+        raise e
 
+def create_today_play(db: Session, user_id: UUID, game_id: int) -> UserMinigamePlay:
     # 오늘 기록 생성
-    def create_today_play(self, user_id: UUID, game_id: int) -> UserMinigamePlay:
+    try:
         play = UserMinigamePlay(
             userId=user_id,
             minigameId=game_id,
             playDate=date.today(),
             playCount=0
         )
-        self.db.add(play)
-        self.db.flush()
+        db.add(play)
+        db.flush()
         return play
-
-def get_minigame_by_id(db: Session, game_id: int) -> Optional[Minigame]:
-    # 게임 ID로 미니게임 정보 조회
-    try:
-        return db.query(Minigame).filter(Minigame.minigameId == game_id).first()
     except SQLAlchemyError as e:
         raise e
 

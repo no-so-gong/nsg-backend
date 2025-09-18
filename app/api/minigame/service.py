@@ -6,12 +6,13 @@ from app.api.ending.repository import get_user_by_id
 from app.models.minigameattempts import MinigameAttempt
 from datetime import date
 from app.api.minigame.repository import (
-    MinigameRepository,
     get_minigame_by_id,
     get_user_by_id,
     get_user_daily_play_count,
     create_minigame_attempt,
-    update_user_daily_play_count
+    update_user_daily_play_count,
+    get_today_play,
+    create_today_play
 )
 from app.api.user.service import process_transaction
 from app.api.minigame.schema import MinigameResultRequest, MinigameResultResponse, MinigameResultData
@@ -23,18 +24,16 @@ def start_minigame(db: Session, user_id: UUID, game_id: int):
     if not user:
         raise CustomException("해당 유저를 찾을 수 없습니다.", 401)
 
-    repo = MinigameRepository(db)
-
-    game = repo.get_game_by_id(game_id)
+    game = get_minigame_by_id(db, game_id)
     if not game:
         raise CustomException("해당 게임을 찾을 수 없습니다.", 404)
 
     max_play = game.maxPlay
 
     # 오늘 플레이 기록 조회
-    play_record = repo.get_today_play(user_id, game_id)
+    play_record = get_today_play(db, user_id, game_id)
     if not play_record:
-        play_record = repo.create_today_play(user_id, game_id)
+        play_record = create_today_play(db, user_id, game_id)
 
     # 횟수 제한 체크
     if play_record.playCount >= max_play:
