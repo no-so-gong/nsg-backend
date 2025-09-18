@@ -13,5 +13,5 @@ class UserMinigamePlay(Base):
     minigameId = Column(Integer, ForeignKey("Minigames.minigameId"), nullable=False)
     
     __table_args__ = (
-        CheckConstraint('playCount >= 0', name='check_play_count_non_negative'),
+        CheckConstraint('"playCount" >= 0', name='check_play_count_non_negative'),
     )
