@@ -41,7 +41,8 @@ def start_minigame(db: Session, user_id: UUID, game_id: int):
 
     # 시작 가능 → playCount 증가 & MinigameAttempt 생성
     play_record.playCount += 1
-    attempt = MinigameAttempt(userId=user_id, minigameId=game_id)
+    from datetime import datetime
+    attempt = MinigameAttempt(userId=user_id, minigameId=game_id, startedAt=datetime.now())
     db.add(attempt)
 
     db.commit()

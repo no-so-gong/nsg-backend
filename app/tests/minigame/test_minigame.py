@@ -3,10 +3,7 @@ from uuid import uuid4
 from datetime import datetime, date
 from fastapi.testclient import TestClient
 
-from app.models.user import User
-from app.models.minigames import Minigame
-from app.models.userminigameplays import UserMinigamePlay
-from app.models.minigameattempts import MinigameAttempt
+from app.models import User, Minigame, UserMinigamePlay, MinigameAttempt
 from app.api.minigame.service import start_minigame
 from app.core.exception import CustomException
 from app.api.ending import repository
@@ -21,19 +18,20 @@ def test_user(db_session):
     db_session.commit()
     return user
 
-@pytest.fixture
-def test_game(db_session):
-    game = Minigame(name="Test Game", maxPlay=3)
-    db_session.add(game)
-    db_session.commit()
-    db_session.refresh(game)  # 자동 생성된 minigameId 가져오기
-    return game
+def create_test_minigames_for_result_tests(db_session):
+    if db_session.query(Minigame).count() == 0:
+        minigames = [
+            Minigame(minigameId=1, name="게임1", description="테스트 게임1", maxPlay=3),
+            Minigame(minigameId=2, name="게임2", description="테스트 게임2", maxPlay=3),
+            Minigame(minigameId=3, name="게임3", description="테스트 게임3", maxPlay=3)
+        ]
+        db_session.add_all(minigames)
+        db_session.commit()
+
 
 def test_start_minigame_success(db_session, test_user):
-    game = Minigame(name="Test Game", maxPlay=3)
-    db_session.add(game)
-    db_session.commit()
-    db_session.refresh(game)  # 자동 생성된 minigameId 사용
+    create_test_minigames_for_result_tests(db_session)
+    game = db_session.query(Minigame).filter(Minigame.minigameId == 1).first()
 
     repository.get_user_by_id = lambda db, uid: test_user
 
@@ -42,21 +40,18 @@ def test_start_minigame_success(db_session, test_user):
 
 
 def test_start_minigame_exceed(db_session, test_user):
-    # 게임 생성 (maxPlay=1)
-    game = Minigame(name="Test Game Exceed", maxPlay=1)
-    db_session.add(game)
-    db_session.commit()
-    db_session.refresh(game)
+    create_test_minigames_for_result_tests(db_session)
+    game = db_session.query(Minigame).filter(Minigame.minigameId == 1).first()
 
     # 유저 조회 mocking
     repository.get_user_by_id = lambda db, uid: test_user
 
-    # 이미 오늘 플레이 기록 생성
+    # 이미 오늘 플레이 기록 생성 (maxPlay=3이므로 3번 플레이한 것으로 설정)
     play = UserMinigamePlay(
         userId=test_user.userId,
         minigameId=game.minigameId,
         playDate=date.today(),
-        playCount=1
+        playCount=3
     )
     db_session.add(play)
     db_session.commit()
@@ -75,16 +70,6 @@ def create_test_user_for_result_tests(db_session):
     db_session.add(user)
     db_session.commit()
     return str(user.userId)
-
-def create_test_minigames_for_result_tests(db_session):
-    if db_session.query(Minigame).count() == 0:
-        minigames = [
-            Minigame(minigameId=1, name="게임1", description="테스트 게임1", maxPlay=3),
-            Minigame(minigameId=2, name="게임2", description="테스트 게임2", maxPlay=3),
-            Minigame(minigameId=3, name="게임3", description="테스트 게임3", maxPlay=3)
-        ]
-        db_session.add_all(minigames)
-        db_session.commit()
 
 def test_successful_game_completion(client, db_session):
     # 게임 정상 완료 테스트
