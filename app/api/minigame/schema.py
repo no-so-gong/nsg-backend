@@ -1,8 +1,12 @@
-# -*- coding: utf-8 -*-
 from pydantic import BaseModel, field_validator, model_validator
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
+
+class MinigameStartResponse(BaseModel):
+    message: str
+    data: dict
+    status: int
 
 class MinigameResultRequest(BaseModel):
     score: Optional[int] = None

@@ -1,15 +1,27 @@
-# -*- coding: utf-8 -*-
-from fastapi import APIRouter, Depends, Header, Path
+from fastapi import APIRouter, Depends, Header
 from sqlalchemy.orm import Session
+from app.core.database import get_db
+from .service import start_minigame
+from .schema import MinigameStartResponse
 from uuid import UUID
 from typing import Annotated
-
-from app.core.database import get_db
 from app.api.minigame.schema import MinigameResultRequest, MinigameResultResponse
 from app.api.minigame.service import process_minigame_result
 from app.core.exception import CustomException
 
-router = APIRouter(prefix="/api/v1/minigames", tags=["minigame"])
+router = APIRouter(prefix="/api/v1/minigames", tags=["Minigame"])
+
+# 미니게임 플레이 요청
+@router.post("/{game_id}/start", response_model=MinigameStartResponse, summary="미니게임 플레이 요청")
+def start_game(
+    game_id: int,
+    user_id: UUID  = Header(..., alias="user-id"),
+    db: Session = Depends(get_db)
+):
+    """
+    특정 미니게임 플레이 시작 요청
+    """
+    return start_minigame(db=db, user_id=user_id, game_id=game_id)
 
 @router.post("/{gameId}/result", response_model=MinigameResultResponse)
 async def submit_minigame_result(
