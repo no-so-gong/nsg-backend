@@ -16,7 +16,6 @@ from app.api.ending.controller import router as ending_router
 from app.api.event.controller import router as event_router
 from app.api.minigame.controller import router as minigames_router
 
-
 # 예외 핸들러
 from app.core.exception import (
     CustomException,
@@ -46,7 +45,6 @@ app.include_router(care_router)
 app.include_router(pet_router)
 app.include_router(user_router)
 app.include_router(event_router)
-app.include_router(ending_router)
 app.include_router(ending_router)
 app.include_router(minigames_router)
 
