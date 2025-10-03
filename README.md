@@ -108,6 +108,8 @@ pip install pydantic
 
 pip install dpython-dotenv
 
+pip install alembic
+
 ```
 
 한번에 설치
