@@ -16,3 +16,12 @@ class ResetResponse(BaseModel):
     totalPlayDays: int
     totalUsedMoney: int
     status: int
+
+
+class EndingSummaryResponse(BaseModel):
+    totalPlayDays: int
+    totalUsedMoney: int
+    consecutiveAttendanceDays: int
+    runawayCount: int
+    message: str
+    status: int
