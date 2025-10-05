@@ -10,6 +10,7 @@ class Animal(Base):
 
     name = Column(String(10), nullable=False)
     isRunaway = Column(Boolean, nullable=False, server_default=text("false"))
+    runawayCount = Column(Integer, nullable=False, server_default=text("0"))
     evolutionStage = Column(Integer, nullable=False, server_default=text("1"))
     currentEmotion = Column(Numeric(5, 2), nullable=False, server_default=text("50.00"))
     birthday = Column(Date, nullable=False)
