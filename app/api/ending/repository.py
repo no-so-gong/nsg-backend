@@ -9,16 +9,23 @@ from app.models.attendance import AttendanceLog
 from app.models.birthday import BirthdayReward
 from app.models.minigameattempts import MinigameAttempt
 from app.models.userminigameplays import UserMinigamePlay
+from app.models.action_log import ActionLog
 
 def delete_user_and_related_data(db: Session, user_id: UUID):
+    # 미니게임 관련 데이터 삭제
     db.execute(delete(MinigameAttempt).where(MinigameAttempt.userId == user_id))
-    db.execute(delete(UserMinigamePlay).where(Animal.userId == user_id))
+    db.execute(delete(UserMinigamePlay).where(UserMinigamePlay.userId == user_id))
 
-    # 연관 데이터 삭제 (동물, 트랜잭션, 출석, 생일 보상, 유저)
+    # 케어 로그 삭제
+    db.execute(delete(ActionLog).where(ActionLog.userId == user_id))
+
+    # 연관 데이터 삭제 (동물, 트랜잭션, 출석, 생일 보상)
     db.execute(delete(Animal).where(Animal.userId == user_id))
     db.execute(delete(MoneyTransaction).where(MoneyTransaction.userId == user_id))
     db.execute(delete(AttendanceLog).where(AttendanceLog.userId == user_id))
     db.execute(delete(BirthdayReward).where(BirthdayReward.userId == user_id))
+
+    # 마지막으로 유저 삭제
     db.execute(delete(User).where(User.userId == user_id))
     db.commit()
 
