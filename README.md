@@ -4,6 +4,7 @@ ML 기반 감정 예측 시스템을 활용한 동물 육성 시뮬레이션 게
 
 ## 목차
 
+- [팀원 소개](#팀원-소개)
 - [프로젝트 소개](#프로젝트-소개)
 - [주요 기능](#주요-기능)
 - [기술 스택](#기술-스택)
@@ -14,9 +15,16 @@ ML 기반 감정 예측 시스템을 활용한 동물 육성 시뮬레이션 게
 - [프로젝트 구조](#프로젝트-구조)
 - [테스트](#테스트)
 
+## 팀원 소개
+
+| Chaehyunlim | DooYee | kimtaeyeon04 |
+|:---:|:---:|:---:|
+| <img src="https://github.com/Chaehyunli.png" width="120" height="120"> | <img src="https://github.com/DOOYEE0709.png" width="120" height="120"> | <img src="https://github.com/kimtaeyeon04.png" width="120" height="120"> |
+| [@Chaehyunli](https://github.com/Chaehyunli) | [@DOOYEE0709](https://github.com/DOOYEE0709) | [@kimtaeyeon04](https://github.com/kimtaeyeon04) |
+
 ## 프로젝트 소개
 
-**No-So-Gong (노소공)** 은 세 마리 동물(시바견, 오리, 병아리)을 케어하며 모두 행복도 100을 달성하는 것을 목표로 하는 육성 시뮬레이션 게임입니다.
+**No-So-Gong (노소공)** 팀의 육성 시뮬레이션 게임 **'노답 삼형제! 이걸 키우라고?'** 의 백엔드 서비스입니다. 세 마리 동물(시바견, 오리, 병아리)을 케어하며 모두 행복도 100을 달성하는 것을 목표로 합니다.
 
 단순한 수치 증감이 아닌, **XGBoost 기반 ML 모델**이 사용자의 행동 패턴을 분석하여 동물의 감정 변화량을 실시간으로 예측합니다. 또한 **편애도(User Pattern Bias) 시스템**을 통해 특정 동물만 집중 케어할 경우 다른 동물의 케어 난이도가 상승하는 전략적 요소를 제공합니다.
 
