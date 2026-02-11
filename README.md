@@ -375,8 +375,12 @@ nsg-backend/
 ├── ML/
 │   └── emotion_model.pkl             # 학습된 감정 예측 ML 모델
 ├── alembic/                           # DB 마이그레이션
+├── alembic.ini                        # Alembic 설정 파일
 ├── create_tables.py                   # 테이블 생성 & 초기 데이터 삽입
+├── test_connection.py                 # DB 연결 테스트 스크립트
 ├── requirements.txt                   # Python 의존성
+├── pytest.ini                         # pytest 설정 파일
+├── runserver.bat                      # 서버 실행 스크립트
 └── .env.example                       # 환경 변수 예시
 ```
 
